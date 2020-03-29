@@ -7,6 +7,10 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.MemoryStack;
 
+import geometry.Rect2D;
+import map.Map;
+import map.MapGeometryGenerator;
+import map.PerlinTopography;
 import types.Pair;
 import ui.AppWindow;
 import ui.InputProcessor;
@@ -30,10 +34,46 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
 import java.nio.IntBuffer;
+import java.util.Random;
 
 // Main application.
 public class App {
 
+	///////////////
+	
+	public class Spec {
+		public Long randSeed = null;//1234567890L;
+		// View specs.
+		public int viewWidth = 1700;
+		public int viewHeight = 1200;
+		// Model specs.
+		public int mapWidth = 500;
+		public int mapHeight = 200;
+		// Smaller distance => smaller and more tiles.
+		public double minSampleDistance = .5;
+		// More candidates => more evenly spaced sample points but slower generation.
+		public int numSampleCandidates = 30;
+		// More octaves => Wider and wider areas are affected by values of
+		// individual noise values of higher octave passes. Leads to zoomed in
+		// appearance on features of the map.
+		public int numOctaves = 7;
+		// Larger persistence => Larger and smoother features.
+		// Smaller persistence => Smaller and choppier features.
+		public double persistence = 2;
+	}
+	
+	// Creates a model spec from an app-wide spec.
+	private static Map.Spec makeModelSpec(Spec appSpec) {
+		Rect2D bounds = new Rect2D(0, 0, appSpec.mapWidth, appSpec.mapHeight);
+		return new Map.Spec(
+				new MapGeometryGenerator.Spec(bounds, appSpec.minSampleDistance,
+						appSpec.numSampleCandidates),
+				new PerlinTopography.Spec(bounds, appSpec.numOctaves,
+						appSpec.persistence));
+	}
+	
+	///////////////
+	
 	private AppWindow wnd = new AppWindow();
 	private InputProcessor input = new InputProcessor();
 	private Renderer renderer = new Renderer();
@@ -41,6 +81,10 @@ public class App {
 	private Scene scene;
 	private Skybox skybox;
 	private Hud hud;
+	private Spec spec;
+	// App-wide random number generator. Must be used everywhere to guarantee
+	// deterministic map generation.
+	private Random rand;
 
 	public void run() {
 		try {
@@ -55,6 +99,8 @@ public class App {
 	}
 
 	private void setup() throws Exception {
+		setupModel();
+		setupRandomization();
 		setupGlfw();
 		setupWindow();
 		setupContext();
@@ -76,6 +122,14 @@ public class App {
 		cleanupGlfw();
 	}
 
+	private void setupModel() {
+		spec = new Spec();
+	}
+	
+	private void setupRandomization() {
+		rand = (spec.randSeed != null) ? new Random(spec.randSeed) : new Random();
+	}
+	
 	private void setupGlfw() {
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
@@ -99,7 +153,7 @@ public class App {
 	private void setupWindow() throws Exception {
 		// Get the resolution of the primary monitor
 		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		wnd.create(1000, 700, "The Map App");
+		wnd.create(spec.viewWidth, spec.viewHeight, "The Map App");
 		var wndSize = wnd.size();
 		wnd.setPosition((vidmode.width() - wndSize.a) / 2, (vidmode.height() - wndSize.b) / 2);
 	}
@@ -175,26 +229,29 @@ public class App {
 	}
 	
 	private void computeMap() throws Exception	{
-			float cubeReflectance = 0.3f;
-	        MapItem map = new MapItem(
-	        		ObjectLoader.loadMesh("/models/cube.obj"),
-	        		new Material(
-	        				new Texture("res/textures/grassblock.png"),
-	        				cubeReflectance));
-			map.setPosition(0, 0, -10);
-			map.setRotation(10, 20, 20);
-			map.setScale(0.8f);
-			scene.addItem(map);
+		map.Map map = new Map(makeModelSpec(spec), rand);
+		map.generate();
+				
+		float cubeReflectance = 0.3f;
+        MapItem mapItem = new MapItem(
+        		ObjectLoader.loadMesh("/models/cube.obj"),
+        		new Material(
+        				new Texture("res/textures/grassblock.png"),
+        				cubeReflectance));
+        mapItem.setPosition(0, 0, -10);
+        mapItem.setRotation(10, 20, 20);
+        mapItem.setScale(0.8f);
+		scene.addItem(mapItem);
 
-			float bunnyReflectance = 0.3f;
-			Vector4f bunnyColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
-			MapItem map2 = new MapItem(
-					ObjectLoader.loadMesh("/models/bunny.obj"),
-	        		new Material(bunnyColor, bunnyReflectance));
-			map2.setPosition(5, 5, -10);
-			map2.setRotation(10, 20, 20);
-			map2.setScale(1.0f);
-			scene.addItem(map2);
+		float bunnyReflectance = 0.3f;
+		Vector4f bunnyColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
+		MapItem mapItem2 = new MapItem(
+				ObjectLoader.loadMesh("/models/bunny.obj"),
+        		new Material(bunnyColor, bunnyReflectance));
+		mapItem2.setPosition(5, 5, -10);
+		mapItem2.setRotation(10, 20, 20);
+		mapItem2.setScale(1.0f);
+		scene.addItem(mapItem2);
 	}
 	
 	private void loop() throws Exception {
