@@ -16,6 +16,8 @@ public class Renderer {
 	private static final float Z_NEAR = 0.01f;
     private static final float Z_FAR = 1000.f;
     private Matrix4f projMat3D;
+    private Matrix4f projMat2D = new Matrix4f();
+    private Matrix4f viewMat = new Matrix4f();
 	private Shader sceneShader;
 	private Shader hudShader;
 	private Shader skyboxShader;
@@ -90,24 +92,24 @@ public class Renderer {
 
     public void render(Scene scene, Skybox skybox, Hud hud, Window wnd, Camera cam) {
         clear();
-        renderScene(scene, cam);
-        renderSkybox(skybox, wnd, cam);
-        renderHud(hud, wnd);
+        
+        update2DProjectionMatrix(wnd);
+        updateViewMatrix(cam);
+        
+        renderScene(scene);
+        renderSkybox(skybox);
+        renderHud(hud);
     }
 
-    private void renderScene(Scene scene, Camera cam) {
-        Matrix4f viewMat = makeViewMatrix(cam);
+    private void renderScene(Scene scene) {
         scene.render(sceneShader, projMat3D, viewMat);
     }
 
-    private void renderSkybox(Skybox skybox, Window wnd, Camera cam) {
-    	Matrix4f viewMat = makeViewMatrix(cam);
+    private void renderSkybox(Skybox skybox) {
         skybox.render(skyboxShader, projMat3D, viewMat);
     }
     
-    private void renderHud(Hud hud, Window wnd) {
-        Pair<Integer, Integer> wndSize = wnd.size();
-        Matrix4f projMat2D = make2DProjectionMatrix(0, 0, wndSize.a, wndSize.b);
+    private void renderHud(Hud hud) {
         hud.render(hudShader, projMat2D);
     }
     
@@ -120,20 +122,20 @@ public class Renderer {
     }
     
     // Transformation for camera position and orientation.
-    private static Matrix4f makeViewMatrix(Camera cam) {
+    private Matrix4f updateViewMatrix(Camera cam) {
         Vector3f cameraPos = cam.position();
         Vector3f rotation = cam.rotation();
 
-        Matrix4f mat = new Matrix4f().identity();
-        mat.rotate((float)Math.toRadians(rotation.x), new Vector3f(1, 0, 0))
+        viewMat.identity();
+        viewMat.rotate((float)Math.toRadians(rotation.x), new Vector3f(1, 0, 0))
             .rotate((float)Math.toRadians(rotation.y), new Vector3f(0, 1, 0));
-        mat.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-        return mat;
+        viewMat.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
+        return viewMat;
     }
     
     // Creates matrix for 2D orthographic projection. 
-    private static Matrix4f make2DProjectionMatrix(float left, float top, float right,
-    		float bottom) {
-    	return new Matrix4f().setOrtho2D(left, right, bottom, top);
+    private Matrix4f update2DProjectionMatrix(Window wnd) {
+    	Pair<Integer, Integer> wndSize = wnd.size();
+    	return projMat2D.setOrtho2D(0, wndSize.a, wndSize.b, 0);
     }
 }
