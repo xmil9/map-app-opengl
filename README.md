@@ -1,5 +1,4 @@
 
 # Map App
-A map generator.
+A map generator with OpenGL rendering.
 
-![Alt text](/graphics/screenshot.png?raw=true "Example map")
