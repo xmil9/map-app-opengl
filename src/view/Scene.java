@@ -6,11 +6,36 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import app.Util;
+
 public class Scene {
 
 	private List<RenderedItem> items = new ArrayList<RenderedItem>();
 	private SceneLighting lighting = new SceneLighting();
+	private Shader shader;
 
+	public Scene() throws Exception {
+		shader = makeSceneShader();
+	}
+	
+	private static Shader makeSceneShader() throws Exception {
+	    Shader shader = new Shader();
+	    shader.createVertexShader(Util.loadResource("/view/SceneVertex.vs"));
+	    shader.createFragmentShader(Util.loadResource("/view/SceneFragment.fs"));
+	    shader.link();
+        shader.createUniform("projectionMatrix");
+        shader.createUniform("modelViewMatrix");
+        shader.createUniform("texture_sampler");
+        shader.createMaterialUniform("material");
+        shader.createUniform("specularPower");
+        shader.createUniform("ambientLight");
+        shader.createPointLightUniform("pointLight");
+        shader.createPointLightUniform("pointLight");
+        shader.createSpotLightUniform("spotLight");
+        shader.createDirectionalLightUniform("directionalLight");
+        return shader;
+	}
+	
 	public void addItem(RenderedItem item) {
 		items.add(item);
 	}
@@ -35,7 +60,7 @@ public class Scene {
     	lighting.setDirectionalLight(light);
     }
     
-    public void render(Shader shader, Matrix4f projMat, Matrix4f viewMat) {
+    public void render(Matrix4f projMat, Matrix4f viewMat) {
         shader.bind();
         shader.setUniform("projectionMatrix", projMat);
         shader.setUniform("texture_sampler", 0);
@@ -55,6 +80,8 @@ public class Scene {
     }
     
     public void cleanup() {
+		if (shader != null)
+			shader.cleanup();
 		for (RenderedItem item : items)
 			item.cleanup();
     }

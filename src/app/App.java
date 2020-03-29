@@ -38,7 +38,7 @@ public class App {
 	private InputProcessor input = new InputProcessor();
 	private Renderer renderer = new Renderer();
 	private Camera camera = new Camera();
-	private Scene scene = new Scene();
+	private Scene scene;
 	private Skybox skybox;
 	private Hud hud;
 
@@ -58,6 +58,7 @@ public class App {
 		setupGlfw();
 		setupWindow();
 		setupContext();
+		setupScene();
 		setupLights();
 		setupHud();
 		setupSkybox();
@@ -157,6 +158,10 @@ public class App {
 		Vector3f position = new Vector3f(-1, 0, 0);
         float intensity = 0.7f;
         scene.setDirectionalLight(new DirectionalLight(color, position, intensity));
+	}
+	
+	private void setupScene() throws Exception {
+		scene = new Scene();
 	}
 	
 	private void setupHud() throws Exception {

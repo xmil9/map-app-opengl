@@ -7,6 +7,7 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
+import app.Util;
 import ui.Window;
 
 public class Hud {
@@ -14,12 +15,24 @@ public class Hud {
     private static final String CHARSET = "ISO-8859-1";
     private final List<RenderedItem> items = new ArrayList<RenderedItem>();
     private final TextItem statusText;
+    private Shader shader;
 
     public Hud(String statusText) throws Exception {
         this.statusText = new TextItem(statusText, new FontTexture(FONT, CHARSET));
         this.statusText.material().setAmbientColor(new Vector4f(0, 0, 0, 1));
-        items.add(this.statusText);
+        this.items.add(this.statusText);
+        this.shader = makeHudShader();
     }
+	
+	private static Shader makeHudShader() throws Exception {
+	    Shader shader = new Shader();
+	    shader.createVertexShader(Util.loadResource("/view/HudVertex.vs"));
+	    shader.createFragmentShader(Util.loadResource("/view/HudFragment.fs"));
+	    shader.link();
+        shader.createUniform("projModelMatrix");
+        shader.createUniform("color");
+        return shader;
+	}
 
     public void setStatusText(String statusText) {
         this.statusText.setText(statusText);
@@ -33,7 +46,7 @@ public class Hud {
         statusText.setPosition(10f, window.height() - 50f, 0);
     }
     
-    public void render(Shader shader, Matrix4f projMat) {
+    public void render(Matrix4f projMat) {
         shader.bind();
         
         for (RenderedItem item : items) {
@@ -46,6 +59,8 @@ public class Hud {
     }
 
     public void cleanup() {
+		if (shader != null)
+			shader.cleanup();
 		for (RenderedItem item : items)
 			item.cleanup();
    }

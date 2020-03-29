@@ -5,7 +5,6 @@ import org.joml.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
 
-import app.Util;
 import types.Pair;
 import ui.Window;
 
@@ -18,15 +17,8 @@ public class Renderer {
     private Matrix4f projMat3D;
     private Matrix4f projMat2D = new Matrix4f();
     private Matrix4f viewMat = new Matrix4f();
-	private Shader sceneShader;
-	private Shader hudShader;
-	private Shader skyboxShader;
 	
 	public void setup(Window wnd) throws Exception {
-		sceneShader = makeSceneShader();
-		hudShader = makeHudShader();
-		skyboxShader = makeSkyBoxShader();
-		
 	    var wndSize = wnd.size();
         float aspectRatio = (float) wndSize.a / wndSize.b;
         projMat3D = make3DProjectionMatrix(aspectRatio);
@@ -43,51 +35,7 @@ public class Renderer {
 		glCullFace(GL_BACK);		
 	}
 	
-	private static Shader makeSceneShader() throws Exception {
-	    Shader shader = new Shader();
-	    shader.createVertexShader(Util.loadResource("/view/SceneVertex.vs"));
-	    shader.createFragmentShader(Util.loadResource("/view/SceneFragment.fs"));
-	    shader.link();
-        shader.createUniform("projectionMatrix");
-        shader.createUniform("modelViewMatrix");
-        shader.createUniform("texture_sampler");
-        shader.createMaterialUniform("material");
-        shader.createUniform("specularPower");
-        shader.createUniform("ambientLight");
-        shader.createPointLightUniform("pointLight");
-        shader.createPointLightUniform("pointLight");
-        shader.createSpotLightUniform("spotLight");
-        shader.createDirectionalLightUniform("directionalLight");
-        return shader;
-	}
-
-    private static Shader makeSkyBoxShader() throws Exception {
-	    Shader shader = new Shader();
-        shader.createVertexShader(Utils.loadResource("/view/SkyboxVertex.vs"));
-        shader.createFragmentShader(Utils.loadResource("/view/SkyboxFragment.fs"));
-        shader.link();
-        shader.createUniform("projectionMatrix");
-        shader.createUniform("modelViewMatrix");
-        shader.createUniform("texture_sampler");
-        shader.createUniform("ambientLight");
-        return shader;
-    }
-	
-	private static Shader makeHudShader() throws Exception {
-	    Shader shader = new Shader();
-	    shader.createVertexShader(Util.loadResource("/view/HudVertex.vs"));
-	    shader.createFragmentShader(Util.loadResource("/view/HudFragment.fs"));
-	    shader.link();
-        shader.createUniform("projModelMatrix");
-        shader.createUniform("color");
-        return shader;
-	}
-	
 	public void cleanup() {
-		if (sceneShader != null)
-			sceneShader.cleanup();
-		if (hudShader != null)
-			hudShader.cleanup();
 	}
 
     public void render(Scene scene, Skybox skybox, Hud hud, Window wnd, Camera cam) {
@@ -96,21 +44,9 @@ public class Renderer {
         update2DProjectionMatrix(wnd);
         updateViewMatrix(cam);
         
-        renderScene(scene);
-        renderSkybox(skybox);
-        renderHud(hud);
-    }
-
-    private void renderScene(Scene scene) {
-        scene.render(sceneShader, projMat3D, viewMat);
-    }
-
-    private void renderSkybox(Skybox skybox) {
-        skybox.render(skyboxShader, projMat3D, viewMat);
-    }
-    
-    private void renderHud(Hud hud) {
-        hud.render(hudShader, projMat2D);
+        scene.render(projMat3D, viewMat);
+        skybox.render(projMat3D, viewMat);
+        hud.render(projMat2D);
     }
     
     public void clear() {

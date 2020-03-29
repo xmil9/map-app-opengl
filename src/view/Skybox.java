@@ -5,16 +5,26 @@ import org.joml.Vector3f;
 
 public class Skybox {
 
-	SkyboxItem item;
-	Vector3f ambientLight;
-	
-	public Skybox() {
-		item = null;
-	}
+	private SkyboxItem item;
+	private Vector3f ambientLight;
+	private Shader shader;
 	
 	public Skybox(String objModel, String textureFile) throws Exception {
 		item = new SkyboxItem(objModel, textureFile);
+		shader = makeSkyBoxShader();
 	}
+
+    private static Shader makeSkyBoxShader() throws Exception {
+	    Shader shader = new Shader();
+        shader.createVertexShader(Utils.loadResource("/view/SkyboxVertex.vs"));
+        shader.createFragmentShader(Utils.loadResource("/view/SkyboxFragment.fs"));
+        shader.link();
+        shader.createUniform("projectionMatrix");
+        shader.createUniform("modelViewMatrix");
+        shader.createUniform("texture_sampler");
+        shader.createUniform("ambientLight");
+        return shader;
+    }
 	
 	public void setScale(float scale) {
 		if (item != null)
@@ -25,7 +35,7 @@ public class Skybox {
 		ambientLight = light;
 	}
 	
-    public void render(Shader shader, Matrix4f projMat, Matrix4f viewMat) {
+    public void render(Matrix4f projMat, Matrix4f viewMat) {
 		if (item == null)
 			return;
 		
@@ -53,6 +63,8 @@ public class Skybox {
     }	
     
     public void cleanup() {
+		if (shader != null)
+			shader.cleanup();
     	if (item != null)
     		item.cleanup();
     }
