@@ -45,7 +45,7 @@ public class Renderer {
         updateViewMatrix(cam);
         
         scene.render(projMat3D, viewMat);
-        skybox.render(projMat3D, viewMat);
+        //skybox.render(projMat3D, viewMat);
         hud.render(projMat2D);
     }
     
