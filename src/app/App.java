@@ -47,12 +47,12 @@ public class App {
 		public int viewWidth = 1700;
 		public int viewHeight = 1200;
 		// Model specs.
-		public int mapWidth = 500;
-		public int mapHeight = 200;
+		public int mapWidth = 20;
+		public int mapHeight = 10;
 		// Smaller distance => smaller and more tiles.
-		public double minSampleDistance = .5;
+		public double minSampleDistance = 1;
 		// More candidates => more evenly spaced sample points but slower generation.
-		public int numSampleCandidates = 30;
+		public int numSampleCandidates = 20;
 		// More octaves => Wider and wider areas are affected by values of
 		// individual noise values of higher octave passes. Leads to zoomed in
 		// appearance on features of the map.
@@ -229,7 +229,7 @@ public class App {
 	}
 	
 	private void computeMap() throws Exception	{
-		map.Map map = new Map(makeModelSpec(spec), rand);
+		map.Map map = new map.Map(makeModelSpec(spec), rand);
 		map.generate();
 				
 		float cubeReflectance = 0.3f;
