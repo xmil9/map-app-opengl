@@ -22,6 +22,7 @@ public abstract class RenderedItem {
             // Bind the texture
             glBindTexture(GL_TEXTURE_2D, texture.id());
         }
+        
         // Bind to the VAO
         glBindVertexArray(shape().vaoId());
         

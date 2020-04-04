@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import geometry.Point2D;
 import geometry.Polygon2D;
+import geometry.Triangle2D;
 
 public class Map {
 
@@ -34,12 +35,15 @@ public class Map {
 		private List<MapNode> nodes;
 		// Lookup of nodes by their locations.
 		private java.util.Map<Point2D, MapNode> nodeLookup;
+		// Triangulation that map was generated with.
+		private List<Triangle2D> triangulation;
 		
 		public Representation() {
 			tiles = new ArrayList<MapTile>();
 			tileLookup = new TreeMap<Point2D, MapTile>(Point2D.makeXYComparator());
 			nodes = new ArrayList<MapNode>();
 			nodeLookup = new TreeMap<Point2D, MapNode>(Point2D.makeXYComparator());
+			triangulation = new ArrayList<>();
 		}
 		
 		// Adds a given tile.
@@ -79,6 +83,22 @@ public class Map {
 		public MapNode findNodeAt(Point2D pos) {
 			return nodeLookup.get(pos);
 		}
+		
+		public void setTriangulation(List<Triangle2D> triang) {
+			triangulation = triang;
+		}
+		
+		public int countTriangles() {
+			if (triangulation != null)
+				return triangulation.size();
+			return 0;
+		}
+		
+		public Triangle2D triangle(int idx) {
+			if (triangulation != null)
+				return triangulation.get(idx);
+			return null;
+		}
 	}
 	
 	///////////////
@@ -107,7 +127,6 @@ public class Map {
 		return spec.geom.bounds.height();
 	}
 	
-	// Returns the number of tiles in the map.
 	public int countTiles() {
 		return rep.tiles.size();
 	}
@@ -118,6 +137,14 @@ public class Map {
 
 	public MapNode node(int idx) {
 		return rep.node(idx);
+	}
+	
+	public int countTriangles() {
+		return rep.triangulation.size();
+	}
+	
+	public Triangle2D triangle(int idx) {
+		return rep.triangle(idx);
 	}
 	
 	// Returns the shapes of all tiles.

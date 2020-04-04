@@ -58,7 +58,7 @@ vec4 diffuseC;
 vec4 speculrC;
 
 
-void setupColors(Material material, vec2 texCoord)
+void setupMaterialColors(Material material, vec2 texCoord)
 {
     if (material.isTextured == 1)
     {
@@ -131,7 +131,7 @@ vec4 calcDirectionalLight(DirectionalLight light, vec3 position, vec3 normal)
 
 void main()
 {
-    setupColors(material, outTexCoord);
+	setupMaterialColors(material, outTexCoord);
     vec4 diffuseSpecularComp = calcDirectionalLight(directionalLight, mvVertexPos, mvVertexNormal);
     diffuseSpecularComp += calcPointLight(pointLight, mvVertexPos, mvVertexNormal); 
     diffuseSpecularComp += calcSpotLight(spotLight, mvVertexPos, mvVertexNormal);

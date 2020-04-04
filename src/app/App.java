@@ -18,7 +18,9 @@ import view.Camera;
 import view.DirectionalLight;
 import view.Hud;
 import view.MapItem;
+import view.MapMeshBuilder;
 import view.Material;
+import view.Mesh;
 import view.ObjectLoader;
 import view.PointLight;
 import view.Renderer;
@@ -231,27 +233,35 @@ public class App {
 	private void computeMap() throws Exception	{
 		map.Map map = new map.Map(makeModelSpec(spec), rand);
 		map.generate();
-				
+		Mesh mapMesh = new MapMeshBuilder(map).build();
+		Vector4f mapColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
+		float mapReflectance = 0.3f;
+        MapItem mapItem = new MapItem(mapMesh, new Material(mapColor, mapReflectance));
+//        mapItem.setPosition(0, 0, -10);
+//        mapItem.setRotation(10, 20, 20);
+//        mapItem.setScale(0.8f);
+		scene.addItem(mapItem);
+		
 		float cubeReflectance = 0.3f;
-        MapItem mapItem = new MapItem(
+        MapItem cube = new MapItem(
         		ObjectLoader.loadMesh("/models/cube.obj"),
         		new Material(
         				new Texture("res/textures/grassblock.png"),
         				cubeReflectance));
-        mapItem.setPosition(0, 0, -10);
-        mapItem.setRotation(10, 20, 20);
-        mapItem.setScale(0.8f);
-		scene.addItem(mapItem);
+        cube.setPosition(0, 0, -10);
+        cube.setRotation(10, 20, 20);
+        cube.setScale(0.8f);
+		scene.addItem(cube);
 
 		float bunnyReflectance = 0.3f;
 		Vector4f bunnyColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
-		MapItem mapItem2 = new MapItem(
+		MapItem bunny = new MapItem(
 				ObjectLoader.loadMesh("/models/bunny.obj"),
         		new Material(bunnyColor, bunnyReflectance));
-		mapItem2.setPosition(5, 5, -10);
-		mapItem2.setRotation(10, 20, 20);
-		mapItem2.setScale(1.0f);
-		scene.addItem(mapItem2);
+		bunny.setPosition(5, 5, -10);
+		bunny.setRotation(10, 20, 20);
+		bunny.setScale(1.0f);
+		scene.addItem(bunny);
 	}
 	
 	private void loop() throws Exception {

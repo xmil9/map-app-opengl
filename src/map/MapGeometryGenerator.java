@@ -71,6 +71,7 @@ public class MapGeometryGenerator {
 		makeMapTiles(tessTiles);
 		populateTileNeighbors(tess.getTriangulation());
 		populateNodeNeighbors(tessTiles);
+		populateTriangulation(tess.getTriangulation());
 	}
 	
 	// Constructs the tiles that the map is segmented into from given tiles of
@@ -156,5 +157,10 @@ public class MapGeometryGenerator {
 			nodeA.addNeighbor(nodeB);
 			nodeB.addNeighbor(nodeA);
 		}
+	}
+	
+	// Populates the data structure holding the triangulation information.
+	private void populateTriangulation(List<Triangle2D> triangulation) {
+		rep.setTriangulation(triangulation);
 	}
 }
