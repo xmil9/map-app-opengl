@@ -19,6 +19,7 @@ import view.DirectionalLight;
 import view.Hud;
 import view.MapItem;
 import view.MapMeshBuilder;
+import view.MapScene;
 import view.Material;
 import view.Mesh;
 import view.ObjectLoader;
@@ -81,6 +82,7 @@ public class App {
 	private Renderer renderer = new Renderer();
 	private Camera camera = new Camera();
 	private Scene scene;
+	private MapScene mapScene;
 	private Skybox skybox;
 	private Hud hud;
 	private Spec spec;
@@ -107,6 +109,7 @@ public class App {
 		setupWindow();
 		setupContext();
 		setupScene();
+		setupMapScene();
 		setupLights();
 		setupHud();
 		setupSkybox();
@@ -220,6 +223,10 @@ public class App {
 		scene = new Scene();
 	}
 	
+	private void setupMapScene() throws Exception {
+		mapScene = new MapScene();
+	}
+	
 	private void setupHud() throws Exception {
 		hud = new Hud("Hello World.");		
 	}
@@ -240,7 +247,7 @@ public class App {
 //        mapItem.setPosition(0, 0, -10);
 //        mapItem.setRotation(10, 20, 20);
 //        mapItem.setScale(0.8f);
-		scene.addItem(mapItem);
+		mapScene.addItem(mapItem);
 		
 		float cubeReflectance = 0.3f;
         MapItem cube = new MapItem(
@@ -271,7 +278,7 @@ public class App {
 			input.process();
 			resize();
 			updateCamera(input);
-			renderer.render(scene, skybox, hud, wnd, camera);
+			renderer.render(scene, mapScene, skybox, hud, wnd, camera);
 			wnd.update();
 		}
 	}

@@ -38,13 +38,15 @@ public class Renderer {
 	public void cleanup() {
 	}
 
-    public void render(Scene scene, Skybox skybox, Hud hud, Window wnd, Camera cam) {
+    public void render(Scene scene, MapScene mapScene, Skybox skybox, Hud hud,
+    		Window wnd, Camera cam) {
         clear();
         
         update2DProjectionMatrix(wnd);
         updateViewMatrix(cam);
         
         scene.render(projMat3D, viewMat);
+        mapScene.render(projMat3D, viewMat);
         //skybox.render(projMat3D, viewMat);
         hud.render(projMat2D);
     }

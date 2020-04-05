@@ -87,7 +87,7 @@ public class MapMeshBuilder {
 				Utils.listToArray(normals),
 				indices.stream().mapToInt(i -> i).toArray(),
 				null,
-				null);
+				Utils.listToArray(colors));
 	}
 	
 	private double generateElevation(Random rand) {
