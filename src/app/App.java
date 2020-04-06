@@ -50,8 +50,8 @@ public class App {
 		public int viewWidth = 1700;
 		public int viewHeight = 1200;
 		// Model specs.
-		public int mapWidth = 20;
-		public int mapHeight = 10;
+		public int mapWidth = 500;
+		public int mapHeight = 500;
 		// Smaller distance => smaller and more tiles.
 		public double minSampleDistance = 1;
 		// More candidates => more evenly spaced sample points but slower generation.
@@ -240,7 +240,7 @@ public class App {
 	private void computeMap() throws Exception	{
 		map.Map map = new map.Map(makeModelSpec(spec), rand);
 		map.generate();
-		Mesh mapMesh = new MapMeshBuilder(map).build();
+		Mesh mapMesh = new MapMeshBuilder(map).buildFromVoronoiTiles();
 		Vector4f mapColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
 		float mapReflectance = 0.3f;
         MapItem mapItem = new MapItem(mapMesh, new Material(mapColor, mapReflectance));

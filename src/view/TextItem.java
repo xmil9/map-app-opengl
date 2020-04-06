@@ -128,9 +128,11 @@ public class TextItem extends RenderedItem {
             startx += charInfo.getWidth();
         }
         
-        float[] posArr = Utils.listToArray(positions);
-        float[] textCoordsArr = Utils.listToArray(textCoords);
-        int[] indicesArr = indices.stream().mapToInt(i->i).toArray();
-        return new Mesh(posArr, normals, indicesArr, textCoordsArr, null);
+        return new Mesh(
+        		Utils.toFloatArray(positions),
+        		normals,
+        		Utils.toIntArray(indices),
+        		Utils.toFloatArray(textCoords),
+        		null);
     }
 }

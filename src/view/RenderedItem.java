@@ -31,7 +31,8 @@ public abstract class RenderedItem {
         
         // Restore state
         glBindVertexArray(0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        if (texture != null)
+        	glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
     // Concatenates a given transformation with the item's transformation.
