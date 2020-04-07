@@ -19,8 +19,8 @@ public class MapMeshBuilder {
 	private final float meshMinX = 0;
 	private final float meshSizeX = 1;
 	// 3D y coordinate is the elevation of 2D map points.
-	private final float meshMinY = -0.5f;
-	private final float meshSizeY = 0.5f;
+	private final float meshMinY = -0.04f;
+	private final float meshSizeY = 0.08f;
 	// 3D z coordinate is the 2D y coordinate.
 	private final float meshMinZ = 0;
 	private final float meshSizeZ = 1;
@@ -307,6 +307,7 @@ public class MapMeshBuilder {
 			float elevMin = meshMinY;
 			float elevRange = surfaceElev - meshMinY;
 			r = 0;
+//			g = elevMin + 0.1f * elevRange;
 			g = (elev - elevMin) / elevRange;
 			b = 1;
 		} else if (elev < treelineElev) {
@@ -314,13 +315,13 @@ public class MapMeshBuilder {
 			float elevMin = surfaceElev;
 			float elevRange = treelineElev - surfaceElev;
 			r = 0.25f;
-			g = 1 - 0.4f + 0.6f * (elev - elevMin) * elevRange;
+			g = 1 -  0.6f * ((elev - elevMin) / elevRange);
 			b = 0;
 		} else {
 			// Gray shade.
 			float elevMin = treelineElev;
 			float elevRange = maxElev - treelineElev;
-			float gray = 0.5f + 0.5f * (elev - elevMin) * elevRange;
+			float gray = 0.5f + 0.5f * ((elev - elevMin) / elevRange);
 			r = gray;
 			g = gray;
 			b = gray;

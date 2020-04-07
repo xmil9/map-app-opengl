@@ -50,8 +50,8 @@ public class App {
 		public int viewWidth = 1700;
 		public int viewHeight = 1200;
 		// Model specs.
-		public int mapWidth = 500;
-		public int mapHeight = 500;
+		public int mapWidth = 300;
+		public int mapHeight = 300;
 		// Smaller distance => smaller and more tiles.
 		public double minSampleDistance = 1;
 		// More candidates => more evenly spaced sample points but slower generation.
@@ -244,31 +244,31 @@ public class App {
 		Vector4f mapColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
 		float mapReflectance = 0.3f;
         MapItem mapItem = new MapItem(mapMesh, new Material(mapColor, mapReflectance));
-//        mapItem.setPosition(0, 0, -10);
-//        mapItem.setRotation(10, 20, 20);
-//        mapItem.setScale(0.8f);
+//        mapItem.setPosition(0, 0, 10);
+        mapItem.setRotation(10, 10, 10);
+        mapItem.setScale(100f);
 		mapScene.addItem(mapItem);
 		
-		float cubeReflectance = 0.3f;
-        MapItem cube = new MapItem(
-        		ObjectLoader.loadMesh("/models/cube.obj"),
-        		new Material(
-        				new Texture("res/textures/grassblock.png"),
-        				cubeReflectance));
-        cube.setPosition(0, 0, -10);
-        cube.setRotation(10, 20, 20);
-        cube.setScale(0.8f);
-		scene.addItem(cube);
-
-		float bunnyReflectance = 0.3f;
-		Vector4f bunnyColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
-		MapItem bunny = new MapItem(
-				ObjectLoader.loadMesh("/models/bunny.obj"),
-        		new Material(bunnyColor, bunnyReflectance));
-		bunny.setPosition(5, 5, -10);
-		bunny.setRotation(10, 20, 20);
-		bunny.setScale(1.0f);
-		scene.addItem(bunny);
+//		float cubeReflectance = 0.3f;
+//        MapItem cube = new MapItem(
+//        		ObjectLoader.loadMesh("/models/cube.obj"),
+//        		new Material(
+//        				new Texture("res/textures/grassblock.png"),
+//        				cubeReflectance));
+//        cube.setPosition(0, 0, -10);
+//        cube.setRotation(10, 20, 20);
+//        cube.setScale(0.8f);
+//		scene.addItem(cube);
+//
+//		float bunnyReflectance = 0.3f;
+//		Vector4f bunnyColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
+//		MapItem bunny = new MapItem(
+//				ObjectLoader.loadMesh("/models/bunny.obj"),
+//        		new Material(bunnyColor, bunnyReflectance));
+//		bunny.setPosition(5, 5, -10);
+//		bunny.setRotation(10, 20, 20);
+//		bunny.setScale(1.0f);
+//		scene.addItem(bunny);
 	}
 	
 	private void loop() throws Exception {
