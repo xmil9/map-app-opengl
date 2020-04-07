@@ -24,7 +24,7 @@ public class Renderer {
         projMat3D = make3DProjectionMatrix(aspectRatio);
 
         // Set the background color.
-		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glEnable(GL_DEPTH_TEST);
 		
 		// Support for transparency.
