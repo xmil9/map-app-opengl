@@ -1,3 +1,9 @@
+//
+// The code in this file is based on code from:
+//   https://github.com/lwjglgamedev/lwjglbook
+// The original code has been modified to suit this project.
+//
+
 package ui;
 
 import org.joml.Vector2d;

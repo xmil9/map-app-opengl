@@ -1,5 +1,11 @@
 #version 460
 
+//
+// The code in this file is based on code from:
+//   https://github.com/lwjglgamedev/lwjglbook
+// The original code has been modified to suit this project.
+//
+
 layout (location=0) in vec3 position;
 layout (location=1) in vec3 color;
 layout (location=2) in vec3 vertexNormal;
