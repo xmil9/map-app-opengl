@@ -244,8 +244,8 @@ public class App {
 		Vector4f mapColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
 		float mapReflectance = 0.3f;
         MapItem mapItem = new MapItem(mapMesh, new Material(mapColor, mapReflectance));
-//        mapItem.setPosition(0, 0, 10);
-        mapItem.setRotation(10, 10, 10);
+        mapItem.setPosition(-50, -40, -180);
+        mapItem.setRotation(00, 0, 0);
         mapItem.setScale(100f);
 		mapScene.addItem(mapItem);
 		
@@ -306,22 +306,26 @@ public class App {
 	
     private void updateCamera(InputProcessor input) {
         // Update camera based on keys.          
-        final float CAMERA_POS_STEP = 0.05f;
+        final float CAMERA_POS_STEP = 0.2f;
     	Vector3f camKeyDelta = input.cameraKeyDelta();
-        camera.movePosition(camKeyDelta.x * CAMERA_POS_STEP, camKeyDelta.y * CAMERA_POS_STEP,
+        camera.movePosition(
+        		camKeyDelta.x * CAMERA_POS_STEP,
+        		camKeyDelta.y * CAMERA_POS_STEP,
         		camKeyDelta.z * CAMERA_POS_STEP);
 
         // Update camera based on mouse.          
         if (input.isRightButtonPressed()) {
         	final float MOUSE_SENSITIVITY = 0.2f;
             Vector2f camMouseDelta = input.mouseDelta();
-            camera.moveRotation(camMouseDelta.x * MOUSE_SENSITIVITY,
-            		camMouseDelta.y * MOUSE_SENSITIVITY, 0);
+            camera.moveRotation(
+            		camMouseDelta.x * MOUSE_SENSITIVITY,
+            		camMouseDelta.y * MOUSE_SENSITIVITY,
+            		0);
         }
         
         // Update point light based on keys.
-    	Vector3f lightDelta = input.lightKeyDelta();
-        camera.movePosition(lightDelta.x, lightDelta.y, lightDelta.z);
+//    	Vector3f lightDelta = input.lightKeyDelta();
+//        camera.movePosition(lightDelta.x, lightDelta.y, lightDelta.z);
     }
 	
 	public static void main(String[] args) {
