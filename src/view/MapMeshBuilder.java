@@ -15,6 +15,7 @@ import types.Triple;
 public class MapMeshBuilder {
 
 	private final map.Map map;
+	TileColorPolicy colorPolicy;
 	// 3D x coordinate is the 2D x coordinate.
 	private final float meshMinX = 0;
 	private final float meshSizeX = 1;
@@ -25,8 +26,9 @@ public class MapMeshBuilder {
 	private final float meshMinZ = 0;
 	private final float meshSizeZ = 1;
 	
-	public MapMeshBuilder(map.Map map) {
+	public MapMeshBuilder(map.Map map, TileColorPolicy colorPolicy) {
 		this.map = map;
+		this.colorPolicy = colorPolicy;
 	}
 	
 	public Mesh buildFromVoronoiTiles() {
@@ -239,7 +241,21 @@ public class MapMeshBuilder {
 		}
 	}
 	
-	private void addTileColors(List<Float> vertices, int seedIdx, List<Float> colors) {
+	private void addTileColors(List<Float> vertices, int seedIdx,
+			List<Float> colors) {
+		switch (colorPolicy) {
+		case BLEND_TILE_NODE_COLORS:
+			addTileColorsByNode(vertices, seedIdx, colors);
+			break;
+		default:
+		case ASSIGN_TILE_SEED_COLORS:
+			addTileColorsBySeed(vertices, seedIdx, colors);
+			break;
+		}
+	}
+	
+	private void addTileColorsByNode(List<Float> vertices, int seedIdx,
+			List<Float> colors) {
 		int lastNodeIdx = lastVertexIndex(vertices);
 		
 		for (int i = seedIdx; i <= lastNodeIdx; ++i) {
@@ -248,6 +264,19 @@ public class MapMeshBuilder {
 			colors.add(color.a);
 			colors.add(color.b);
 			colors.add(color.c);
+		}
+	}
+	
+	private void addTileColorsBySeed(List<Float> vertices, int seedIdx,
+			List<Float> colors) {
+		int seedYCoordIdx = seedIdx * 3 + 1;
+		Triple<Float, Float, Float> seedColor = interpolateColor(vertices.get(seedYCoordIdx));
+
+		int lastNodeIdx = lastVertexIndex(vertices);
+		for (int i = seedIdx; i <= lastNodeIdx; ++i) {
+			colors.add(seedColor.a);
+			colors.add(seedColor.b);
+			colors.add(seedColor.c);
 		}
 	}
 	
@@ -314,8 +343,10 @@ public class MapMeshBuilder {
 			b = 1;
 		} else if (elev < beachElev) {
 			// Yellow beaches.
+			float elevMin = surfaceElev;
+			float elevRange = beachElev - elevMin;
 			r = 1f;
-			g = 0.9f;
+			g = 0.95f - 0.08f * (elev - elevMin) / elevRange;
 			b = 0.5f;
 		} else if (elev < humidElev) {
 			// Green vegetation.

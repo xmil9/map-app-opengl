@@ -29,6 +29,7 @@ import view.Scene;
 import view.Skybox;
 import view.SpotLight;
 import view.Texture;
+import view.TileColorPolicy;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.GL_VIEWPORT;
@@ -49,6 +50,7 @@ public class App {
 		// View specs.
 		public int viewWidth = 1700;
 		public int viewHeight = 1200;
+		public TileColorPolicy tileColorPolicy = TileColorPolicy.ASSIGN_TILE_SEED_COLORS;
 		// Model specs.
 		public int mapWidth = 300;
 		public int mapHeight = 300;
@@ -240,7 +242,8 @@ public class App {
 	private void computeMap() throws Exception	{
 		map.Map map = new map.Map(makeModelSpec(spec), rand);
 		map.generate();
-		Mesh mapMesh = new MapMeshBuilder(map).buildFromVoronoiTiles();
+		Mesh mapMesh = new MapMeshBuilder(map, spec.tileColorPolicy)
+				.buildFromVoronoiTiles();
 		Vector4f mapColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
 		float mapReflectance = 0.3f;
         MapItem mapItem = new MapItem(mapMesh, new Material(mapColor, mapReflectance));
