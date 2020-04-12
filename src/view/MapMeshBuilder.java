@@ -295,33 +295,55 @@ public class MapMeshBuilder {
 	// The range of the given elevation is [meshMinY, meshMinY + meshSizeY].
 	private Triple<Float, Float, Float> interpolateColor(float elev) {
 		float maxElev = meshMinY + meshSizeY;
-		float surfaceElev = 0;
+		float surfaceElev = -0.02f;
 		float landRange = maxElev - surfaceElev;
-		float treelineElev = surfaceElev + 0.66f * landRange;
+		float beachElev = surfaceElev + 0.05f * landRange;
+		float humidElev = surfaceElev + 0.33f * landRange;
+		float aridElev = surfaceElev + 0.66f * landRange;
+		float rockyElev = surfaceElev + 0.90f * landRange;
 		
 		float r = 0;
 		float g = 0;
 		float b = 0;
 		if (elev < surfaceElev) {
-			// Blue shade.
+			// Blue water.
 			float elevMin = meshMinY;
-			float elevRange = surfaceElev - meshMinY;
+			float elevRange = surfaceElev - elevMin;
 			r = 0;
-//			g = elevMin + 0.1f * elevRange;
-			g = (elev - elevMin) / elevRange;
+			g = 0.5f * (elev - elevMin) / elevRange;
 			b = 1;
-		} else if (elev < treelineElev) {
-			// Green shade.
-			float elevMin = surfaceElev;
-			float elevRange = treelineElev - surfaceElev;
-			r = 0.25f;
-			g = 1 -  0.6f * ((elev - elevMin) / elevRange);
+		} else if (elev < beachElev) {
+			// Yellow beaches.
+			r = 1f;
+			g = 0.9f;
+			b = 0.5f;
+		} else if (elev < humidElev) {
+			// Green vegetation.
+			float elevMin = beachElev;
+			float elevRange = humidElev - elevMin;
+			r = 0.03f;
+			g = 0.34f +  0.3f * ((elev - elevMin) / elevRange);
 			b = 0;
+		} else if (elev < aridElev) {
+			// Brown grassland.
+			float elevMin = humidElev;
+			float elevRange = aridElev - elevMin;
+			r = 0.86f;
+			g = 0.8f - 0.3f * ((elev - elevMin) / elevRange);
+			b = 0;
+		} else if (elev < rockyElev) {
+			// Gray rocks.
+			float elevMin = aridElev;
+			float elevRange = rockyElev - elevMin;
+			float gray = 0.75f - 0.5f * ((elev - elevMin) / elevRange);
+			r = gray;
+			g = gray;
+			b = gray;
 		} else {
-			// Gray shade.
-			float elevMin = treelineElev;
-			float elevRange = maxElev - treelineElev;
-			float gray = 0.5f + 0.5f * ((elev - elevMin) / elevRange);
+			// White snow.
+			float elevMin = rockyElev;
+			float elevRange = maxElev - elevMin;
+			float gray = 0.85f + 0.15f * ((elev - elevMin) / elevRange);
 			r = gray;
 			g = gray;
 			b = gray;
