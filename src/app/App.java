@@ -50,12 +50,12 @@ public class App {
 		public int viewWidth = 1700;
 		public int viewHeight = 1200;
 		public TileColorPolicy tileColorPolicy = TileColorPolicy.ASSIGN_TILE_SEED_COLORS;
-		// The fraction of the max width/height of the map that the 3D elevation values
-		// are calculated to fall into.
-		// Larger fraction => steeper map.
-		// Smaller fraction => shallower map.
+		public boolean haveBeaches = false;
+		// Measure for steepness of map features.
+		// Larger => steeper map.
+		// Smaller => shallower map.
 		public float elevScale3D = 50f;
-		// Ratio of elevation range at which the surface is located.
+		// Ratio of elevation at which the surface is located.
 		// Closer to 0.0 => Lower surface, less water
 		// Closer to 1.0 => Higher surface, more water
 		public float surfaceElevRatio3D = 0.6f;
@@ -90,7 +90,7 @@ public class App {
 		float elevRange3D = spec.elevScale3D / (float) Math.max(
 				spec.mapWidth, spec.mapHeight);
 		return new MapMeshBuilder.Spec(spec.tileColorPolicy, elevRange3D,
-				spec.surfaceElevRatio3D);
+				spec.surfaceElevRatio3D, spec.haveBeaches);
 	}
 	
 	///////////////

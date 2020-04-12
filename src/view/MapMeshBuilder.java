@@ -17,13 +17,15 @@ public class MapMeshBuilder {
 	public static class Spec {
 		public TileColorPolicy colorPolicy;
 		public float elevRange3D;
-		public float surfaceElevRatio3D; 
+		public float surfaceElevRatio3D;
+		public boolean haveBeaches;
 
 		public Spec(TileColorPolicy colorPolicy, float elevRange3D,
-				float surfaceElevRatio3D) {
+				float surfaceElevRatio3D, boolean haveBeaches) {
 			this.colorPolicy = colorPolicy;
 			this.elevRange3D = elevRange3D;
 			this.surfaceElevRatio3D = surfaceElevRatio3D;
+			this.haveBeaches = haveBeaches;
 		}
 	}
 	
@@ -361,7 +363,7 @@ public class MapMeshBuilder {
 			r = 0;
 			g = 0.5f * (elev - elevMin) / elevRange;
 			b = 1;
-		} else if (elev < beachElev) {
+		} else if (elev < beachElev && spec.haveBeaches) {
 			// Yellow beaches.
 			float elevMin = surfaceElev;
 			float elevRange = beachElev - elevMin;
@@ -370,7 +372,7 @@ public class MapMeshBuilder {
 			b = 0.5f;
 		} else if (elev < humidElev) {
 			// Green vegetation.
-			float elevMin = beachElev;
+			float elevMin = spec.haveBeaches ? beachElev : surfaceElev;
 			float elevRange = humidElev - elevMin;
 			r = 0.03f;
 			g = 0.34f +  0.3f * ((elev - elevMin) / elevRange);
