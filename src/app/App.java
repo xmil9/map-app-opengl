@@ -61,8 +61,8 @@ public class App {
 		public float surfaceElevRatio3D = 0.6f;
 		
 		// Model specs.
-		public int mapWidth = 1000;
-		public int mapHeight = 1000;
+		public int mapWidth = 500;
+		public int mapHeight = 500;
 		// Smaller distance => smaller and more tiles.
 		public double minSampleDistance = 1;
 		// More candidates => more evenly spaced sample points but slower generation.
@@ -258,8 +258,7 @@ public class App {
 	private void computeMap() throws Exception	{
 		map.Map map = new map.Map(makeModelSpec(spec), rand);
 		map.generate();
-		Mesh mapMesh = new MapMeshBuilder(map, makeMeshBuilderSpec(spec))
-				.buildFromVoronoiTiles();
+		Mesh mapMesh = new MapMeshBuilder(map, makeMeshBuilderSpec(spec)).build();
 		Vector4f mapColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
 		float mapReflectance = 0.3f;
         MapItem mapItem = new MapItem(mapMesh, new Material(mapColor, mapReflectance));

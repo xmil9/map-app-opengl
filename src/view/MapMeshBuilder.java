@@ -10,8 +10,11 @@ import map.MapNode;
 import map.MapTile;
 import types.Triple;
 
+// Builds a 3D mesh for a 2D map.
 public class MapMeshBuilder {
 
+	///////////////
+	
 	public static class Spec {
 		public TileColorPolicy colorPolicy;
 		public float elevRange3D;
@@ -51,7 +54,7 @@ public class MapMeshBuilder {
 		this.meshSizeY = spec.elevRange3D;
 	}
 	
-	public Mesh buildFromVoronoiTiles() {
+	public Mesh build() {
 		// Coordinates of all 3D vertices in x, y, z order.
 		// The order of the vertices does not matter. The rendering is
 		// determined by the indices array.
@@ -110,6 +113,7 @@ public class MapMeshBuilder {
 				Utils.toFloatArray(colors));
 	}
 	
+	// Adds the 3D coordinates of a given 2D map point to the vertex list. 
 	private int addVertexCoords(Point2D pt, double elev, List<Float> vertices) {
 		// 2D x -> 3D x
 		vertices.add(interpolateX(pt.x));
@@ -120,6 +124,7 @@ public class MapMeshBuilder {
 		return lastVertexIndex(vertices);
 	}
 	
+	// Add the coordinates of a given normal to the normal list. 
 	private int addNormalCoords(Vector3f normal, List<Float> normals) {
 		normals.add(normal.x);
 		normals.add(normal.y);
@@ -127,6 +132,7 @@ public class MapMeshBuilder {
 		return lastVertexIndex(normals);
 	}
 	
+	// Adds normals for each node and the seed of a given tile to the normal list. 
 	private void addTileNormals(List<Float> vertices, int seedIdx, List<Float> normals) {
 		int firstNodeIdx = seedIdx + 1;
 		int lastNodeIdx = lastVertexIndex(vertices);
@@ -180,6 +186,7 @@ public class MapMeshBuilder {
 		}
 	}
 	
+	// Adds the color components for a given tile to the color list.
 	private void addTileColors(List<Float> vertices, int seedIdx,
 			List<Float> colors) {
 		switch (spec.colorPolicy) {
@@ -193,6 +200,8 @@ public class MapMeshBuilder {
 		}
 	}
 	
+	// Adds the color components for a given tile to the color list. Uses the elevation
+	// of each individual node as base for the each node's color.
 	private void addTileColorsByNode(List<Float> vertices, int seedIdx,
 			List<Float> colors) {
 		int lastNodeIdx = lastVertexIndex(vertices);
@@ -206,6 +215,8 @@ public class MapMeshBuilder {
 		}
 	}
 	
+	// Adds the color components for a given tile to the color list. Uses the seed's
+	// color for all nodes of the tile.
 	private void addTileColorsBySeed(List<Float> vertices, int seedIdx,
 			List<Float> colors) {
 		int seedYCoordIdx = seedIdx * 3 + 1;
@@ -219,6 +230,7 @@ public class MapMeshBuilder {
 		}
 	}
 	
+	// Creates a Vector3f object from a given index into the vertex list.
 	private Vector3f makeVertex3D(List<Float> vertices, int vertexIdx) {
 		int coordIdx = vertexIdx * 3;
 		return new Vector3f(
@@ -227,25 +239,30 @@ public class MapMeshBuilder {
 				vertices.get(coordIdx + 2));
 	}
 	
+	// Returns the index of the vertex that will be added next to the vertext list.
 	private static int nextVertexIndex(List<Float> vertices) {
 		return vertices.size() / 3;
 	}
 
+	// Returns the index of the last vertex in the vertext list.
 	// Returns -1 when there are no vertices.
 	private static int lastVertexIndex(List<Float> vertices) {
 		return nextVertexIndex(vertices) - 1;
 	}
 	
+	// Returns the 3D x coordinate for a given 2D x coordinate.
 	private float interpolateX(double x2D) {
 		return meshMinX + meshSizeX * (float) (x2D / map.width()); 
 	}
 	
+	// Returns the 3D y coordinate for a given 2D elevation.
 	private float interpolateY(double elev2D) {
 		double elevMin2D = -1;
 		double elevRange2D = 2; 
 		return meshMinY + meshSizeY * (float) ((elev2D - elevMin2D) / elevRange2D); 
 	}
 	
+	// Returns the 3D z coordinate for a given 2D y coordinate.
 	private float interpolateZ(double y2D) {
 		return meshMinZ + meshSizeZ * (float) (y2D / map.height()); 
 	}
