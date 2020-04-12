@@ -14,21 +14,41 @@ import types.Triple;
 
 public class MapMeshBuilder {
 
+	public static class Spec {
+		public TileColorPolicy colorPolicy;
+		public float elevRange3D;
+		public float surfaceElevRatio3D; 
+
+		public Spec(TileColorPolicy colorPolicy, float elevRange3D,
+				float surfaceElevRatio3D) {
+			this.colorPolicy = colorPolicy;
+			this.elevRange3D = elevRange3D;
+			this.surfaceElevRatio3D = surfaceElevRatio3D;
+		}
+	}
+	
+	///////////////
+	
 	private final map.Map map;
-	TileColorPolicy colorPolicy;
-	// 3D x coordinate is the 2D x coordinate.
+	private final Spec spec;
+	// Min value and range of the 3D x coordinates.
+	// 2D x coordinates are mapped to 3D x coordinates.
 	private final float meshMinX = 0;
 	private final float meshSizeX = 1;
-	// 3D y coordinate is the elevation of 2D map points.
-	private final float meshMinY = -0.04f;
-	private final float meshSizeY = 0.08f;
-	// 3D z coordinate is the 2D y coordinate.
+	// Min value and range of the 3D y coordinates.
+	// 2D elevation values are mapped to 3D y coordinates.
+	private final float meshMinY;
+	private final float meshSizeY;
+	// Min value and range of the 3D z coordinates.
+	// 2D y coordinates are mapped to 3D z coordinates.
 	private final float meshMinZ = 0;
 	private final float meshSizeZ = 1;
 	
-	public MapMeshBuilder(map.Map map, TileColorPolicy colorPolicy) {
+	public MapMeshBuilder(map.Map map, Spec spec) {
 		this.map = map;
-		this.colorPolicy = colorPolicy;
+		this.spec = spec;
+		this.meshMinY = -spec.elevRange3D / 2;
+		this.meshSizeY = spec.elevRange3D;
 	}
 	
 	public Mesh buildFromVoronoiTiles() {
@@ -243,7 +263,7 @@ public class MapMeshBuilder {
 	
 	private void addTileColors(List<Float> vertices, int seedIdx,
 			List<Float> colors) {
-		switch (colorPolicy) {
+		switch (spec.colorPolicy) {
 		case BLEND_TILE_NODE_COLORS:
 			addTileColorsByNode(vertices, seedIdx, colors);
 			break;
@@ -311,9 +331,9 @@ public class MapMeshBuilder {
 	}
 	
 	private float interpolateY(double elev2D) {
-		double elevMin = -1;
-		double elevRange = 2; 
-		return meshMinY + meshSizeY * (float) ((elev2D - elevMin) / elevRange); 
+		double elevMin2D = -1;
+		double elevRange2D = 2; 
+		return meshMinY + meshSizeY * (float) ((elev2D - elevMin2D) / elevRange2D); 
 	}
 	
 	private float interpolateZ(double y2D) {
@@ -324,7 +344,7 @@ public class MapMeshBuilder {
 	// The range of the given elevation is [meshMinY, meshMinY + meshSizeY].
 	private Triple<Float, Float, Float> interpolateColor(float elev) {
 		float maxElev = meshMinY + meshSizeY;
-		float surfaceElev = -0.02f;
+		float surfaceElev = meshMinY + spec.surfaceElevRatio3D * meshSizeY;
 		float landRange = maxElev - surfaceElev;
 		float beachElev = surfaceElev + 0.05f * landRange;
 		float humidElev = surfaceElev + 0.33f * landRange;

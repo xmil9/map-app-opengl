@@ -22,13 +22,11 @@ import view.MapMeshBuilder;
 import view.MapScene;
 import view.Material;
 import view.Mesh;
-import view.ObjectLoader;
 import view.PointLight;
 import view.Renderer;
 import view.Scene;
 import view.Skybox;
 import view.SpotLight;
-import view.Texture;
 import view.TileColorPolicy;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -47,13 +45,24 @@ public class App {
 	
 	public class Spec {
 		public Long randSeed = null;//1234567890L;
+		
 		// View specs.
 		public int viewWidth = 1700;
 		public int viewHeight = 1200;
 		public TileColorPolicy tileColorPolicy = TileColorPolicy.ASSIGN_TILE_SEED_COLORS;
+		// The fraction of the max width/height of the map that the 3D elevation values
+		// are calculated to fall into.
+		// Larger fraction => steeper map.
+		// Smaller fraction => shallower map.
+		public float elevScale3D = 50f;
+		// Ratio of elevation range at which the surface is located.
+		// Closer to 0.0 => Lower surface, less water
+		// Closer to 1.0 => Higher surface, more water
+		public float surfaceElevRatio3D = 0.6f;
+		
 		// Model specs.
-		public int mapWidth = 300;
-		public int mapHeight = 300;
+		public int mapWidth = 1000;
+		public int mapHeight = 1000;
 		// Smaller distance => smaller and more tiles.
 		public double minSampleDistance = 1;
 		// More candidates => more evenly spaced sample points but slower generation.
@@ -61,7 +70,7 @@ public class App {
 		// More octaves => Wider and wider areas are affected by values of
 		// individual noise values of higher octave passes. Leads to zoomed in
 		// appearance on features of the map.
-		public int numOctaves = 7;
+		public int numOctaves = 9;
 		// Larger persistence => Larger and smoother features.
 		// Smaller persistence => Smaller and choppier features.
 		public double persistence = 2;
@@ -75,6 +84,13 @@ public class App {
 						appSpec.numSampleCandidates),
 				new PerlinTopography.Spec(bounds, appSpec.numOctaves,
 						appSpec.persistence));
+	}
+	
+	private static MapMeshBuilder.Spec makeMeshBuilderSpec(Spec spec) {
+		float elevRange3D = spec.elevScale3D / (float) Math.max(
+				spec.mapWidth, spec.mapHeight);
+		return new MapMeshBuilder.Spec(spec.tileColorPolicy, elevRange3D,
+				spec.surfaceElevRatio3D);
 	}
 	
 	///////////////
@@ -242,7 +258,7 @@ public class App {
 	private void computeMap() throws Exception	{
 		map.Map map = new map.Map(makeModelSpec(spec), rand);
 		map.generate();
-		Mesh mapMesh = new MapMeshBuilder(map, spec.tileColorPolicy)
+		Mesh mapMesh = new MapMeshBuilder(map, makeMeshBuilderSpec(spec))
 				.buildFromVoronoiTiles();
 		Vector4f mapColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
 		float mapReflectance = 0.3f;
