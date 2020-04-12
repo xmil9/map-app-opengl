@@ -2,12 +2,10 @@ package view;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.joml.Vector3f;
 
 import geometry.Point2D;
-import geometry.Triangle2D;
 import map.MapNode;
 import map.MapTile;
 import types.Triple;
@@ -110,87 +108,6 @@ public class MapMeshBuilder {
 				Utils.toIntArray(indices),
 				null,
 				Utils.toFloatArray(colors));
-	}
-	
-	public Mesh buildFromTriangulation() {
-		Random rand = new Random(1234567890);
-		
-		// Coordinates of all 3D vertices in x, y, z order.
-		// The order of the vertices does not matter. The rendering is
-		// determined by the indices array.
-		List<Float> vertices = new ArrayList<Float>();
-		// Coordinates of the 3D normals in x, y, z order.
-		// Order of the normals has to match the order of the vertices
-		// in the 'vertices' array.
-		List<Float> normals = new ArrayList<Float>();
-		// Indices of the vertices to render. Each index refers to the
-		// vertex's index in the vertices array (the vertex's x coord
-		// index divided by 3).
-		List<Integer> indices = new ArrayList<Integer>();
-		// Colors for the vertices. Each color is a rgb tuple.  
-		// Order of the colors has to match the order of the vertices
-		// in the 'vertices' array.
-		List<Float> colors = new ArrayList<Float>();
-
-		int numTris = map.countTriangles();
-		for (int i = 0; i < numTris; ++i) {
-			Triangle2D tri = map.triangle(i);
-			for (int j = 0; j < 3; ++j ) {
-				Point2D pt = tri.vertex(j);
-				// 2D x -> 3D x
-				float x = interpolateX(pt.x);
-				vertices.add(x);
-				// 2D elevation -> 3D y
-				float y = interpolateY(generateElevation(rand));
-				vertices.add(y);
-				// 2D y -> 3D z
-				float z = interpolateZ(pt.y);
-				vertices.add(z);
-
-				// Right now each vertex has its own instance. 
-				indices.add(indices.size());
-			}
-			
-			// Calc normal of triangle and use for each of its vertices.
-			// This is just temporary!
-			Vector3f normal = calcTriangleNormal(vertices, vertices.size() - 9);
-			for (int j = 0; j < 3; ++j) {
-				normals.add(normal.x);
-				normals.add(normal.y);
-				normals.add(normal.z);
-			}
-			
-			// Set color for each vertex of the triangle.
-			for (int j = 0; j < 9; ++j)
-				colors.add(genColorComponent(rand));
-		}
-		
-		return new Mesh(
-				Utils.toFloatArray(vertices),
-				Utils.toFloatArray(normals),
-				Utils.toIntArray(indices),
-				null,
-				Utils.toFloatArray(colors));
-	}
-	
-	private Vector3f calcTriangleNormal(List<Float> vertices, int firstVertexIdx) {
-		int pt1Idx = firstVertexIdx;
-		int pt2Idx = pt1Idx + 3;
-		int pt3Idx = pt2Idx + 3;
-		
-		Vector3f v = new Vector3f(
-				vertices.get(pt1Idx) - vertices.get(pt2Idx),
-				vertices.get(pt1Idx + 1) - vertices.get(pt2Idx + 1),
-				vertices.get(pt1Idx + 2) - vertices.get(pt2Idx + 2));
-		Vector3f w = new Vector3f(
-				vertices.get(pt3Idx) - vertices.get(pt2Idx),
-				vertices.get(pt3Idx + 1) - vertices.get(pt2Idx + 1),
-				vertices.get(pt3Idx + 2) - vertices.get(pt2Idx + 2));
-		
-		Vector3f normal = new Vector3f();
-		v.cross(w, normal);
-		normal.normalize();
-		return normal;
 	}
 	
 	private int addVertexCoords(Point2D pt, double elev, List<Float> vertices) {
@@ -317,15 +234,6 @@ public class MapMeshBuilder {
 	// Returns -1 when there are no vertices.
 	private static int lastVertexIndex(List<Float> vertices) {
 		return nextVertexIndex(vertices) - 1;
-	}
-	
-	private double generateElevation(Random rand) {
-		return 0;
-//		return -0.1 + 0.2 * rand.nextFloat();
-	}
-	
-	private float genColorComponent(Random rand) {
-		return rand.nextFloat();
 	}
 	
 	private float interpolateX(double x2D) {
