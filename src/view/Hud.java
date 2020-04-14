@@ -49,7 +49,7 @@ public class Hud {
     }
     
     public void resize(Window window) {
-        statusText.setPosition(10f, window.height() - 50f, 0);
+        statusText.setPosition(10f, 20f, 0);
     }
     
     public void render(Matrix4f projMat) {
