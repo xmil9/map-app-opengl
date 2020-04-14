@@ -25,7 +25,7 @@ public class Hud {
 
     public Hud(String statusText) throws Exception {
         this.statusText = new TextItem(statusText, new FontTexture(FONT, CHARSET));
-        this.statusText.material().setAmbientColor(new Vector4f(0, 0, 0, 1));
+        this.statusText.material().setAmbientColor(new Vector4f(0.8f, 0.8f, 0.8f, 1));
         this.items.add(this.statusText);
         this.shader = makeHudShader();
     }

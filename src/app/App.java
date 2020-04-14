@@ -44,7 +44,7 @@ public class App {
 	///////////////
 	
 	public class Spec {
-		public Long randSeed = null;//1234567890L;
+		public Long randSeed = 1234567890L;
 		
 		// View specs.
 		public int viewWidth = 1700;
@@ -121,7 +121,7 @@ public class App {
 	}
 
 	private void setup() throws Exception {
-		setupModel();
+		setupSpec();
 		setupRandomization();
 		setupGlfw();
 		setupWindow();
@@ -145,12 +145,15 @@ public class App {
 		cleanupGlfw();
 	}
 
-	private void setupModel() {
+	private void setupSpec() {
 		spec = new Spec();
 	}
 	
 	private void setupRandomization() {
-		rand = (spec.randSeed != null) ? new Random(spec.randSeed) : new Random();
+		// Generate a random seed if none is given. 
+		if (spec.randSeed == null)
+			spec.randSeed = Math.abs(new Random().nextLong());
+		rand = new Random(spec.randSeed);
 	}
 	
 	private void setupGlfw() {
@@ -246,7 +249,8 @@ public class App {
 	}
 	
 	private void setupHud() throws Exception {
-		hud = new Hud("Hello World.");		
+		String seedInfo = "Map seed: " + spec.randSeed; 
+		hud = new Hud(seedInfo);		
 	}
 	
 	private void setupSkybox() throws Exception {
