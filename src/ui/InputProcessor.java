@@ -65,9 +65,9 @@ public class InputProcessor {
         else if (wnd.isKeyPressed(GLFW_KEY_D))
             cameraKeyDelta.x = 1;
         
-        if (wnd.isKeyPressed(GLFW_KEY_Z))
+        if (wnd.isKeyPressed(GLFW_KEY_Q))
             cameraKeyDelta.y = -1;
-        else if (wnd.isKeyPressed(GLFW_KEY_X))
+        else if (wnd.isKeyPressed(GLFW_KEY_E))
             cameraKeyDelta.y = 1;
         
         lightKeyDelta.set(0, 0, 0);
