@@ -114,4 +114,8 @@ public class InputProcessor {
     public boolean isRightButtonPressed() {
         return isRightButtonPressed;
     }
+    
+    public Vector2d mousePosition() {
+    	return curMousePos;
+    }
 }

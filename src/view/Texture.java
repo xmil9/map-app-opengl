@@ -36,6 +36,14 @@ public class Texture {
         this.height = result.c;
     }
 
+    public int width() {
+        return width;
+    }
+
+    public int height() {
+        return height;
+    }
+
     public void bind() {
         glBindTexture(GL_TEXTURE_2D, id);
     }
@@ -106,13 +114,19 @@ public class Texture {
         // Tell OpenGL how to unpack the RGBA bytes. Each component is 1 byte size
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
+        // Settings that can be used instead of a mipmap (see below) to scale the
+        // image. The settings basically specify that the nearest pixel should be
+        // used when a object surface position does not exactly map to an image
+        // pixel. 
 //        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 //        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-        // Upload the texture data
+        // Upload the texture data.
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
         		GL_UNSIGNED_BYTE, buf);
-        // Generate Mip Map
+        
+        // Generate mipmap. A mipmap is a set of generated images at different
+        // resolutions that are used for scaled drawing of the image. 
         glGenerateMipmap(GL_TEXTURE_2D);
 
         return textureId;

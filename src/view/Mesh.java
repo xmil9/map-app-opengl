@@ -9,6 +9,8 @@ package view;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL30.*;
 
+import org.joml.Vector3f;
+
 public class Mesh {
 
 	private final int vaoId;
@@ -21,6 +23,7 @@ public class Mesh {
 	private final VertexIndexVbo indexVbo;
 	private final ColorVbo colorVbo;
 	private final TextureCoordVbo texCoordVbo;
+	private Vector3f dim;
 
     public Mesh(float[] vertices, float[] normals, int[] vertexIndices,
     		float[] texCoords, float[] colors) {
@@ -54,7 +57,9 @@ public class Mesh {
         indexVbo.setIndices(vertexIndices);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);         
+        glBindVertexArray(0);
+        
+        dim = calcDimensions(vertices);
     }
 
     public int vaoId() {
@@ -66,6 +71,10 @@ public class Mesh {
         return indexVbo.count();
     }
 
+    public Vector3f dimensions() {
+    	return dim;
+    }
+    
     public void cleanup() {
         glDisableVertexAttribArray(0);
 
@@ -83,5 +92,29 @@ public class Mesh {
         // Delete the VAO
         glBindVertexArray(0);
         glDeleteVertexArrays(vaoId);
+    }
+    
+    private static Vector3f calcDimensions(float[] vertices) {
+    	Vector3f min = new Vector3f(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
+    	Vector3f max = new Vector3f(Float.MIN_VALUE, Float.MIN_VALUE, Float.MIN_VALUE);
+    	
+    	for (int i = 0; i < vertices.length; i += 3) {
+    		if (vertices[i] < min.x)
+    			min.x = vertices[i]; 
+    		if (vertices[i] > max.x)
+    			max.x = vertices[i]; 
+
+    		if (vertices[i+1] < min.y)
+    			min.y = vertices[i+1]; 
+    		if (vertices[i+1] > max.y)
+    			max.y = vertices[i+1]; 
+
+    		if (vertices[i+2] < min.z)
+    			min.z = vertices[i+2]; 
+    		if (vertices[i+2] > max.z)
+    			max.z = vertices[i+2]; 
+    	}
+    	
+    	return max.sub(min);
     }
 }

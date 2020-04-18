@@ -39,7 +39,7 @@ import java.nio.IntBuffer;
 import java.util.Random;
 
 // Main application.
-public class App {
+public class App implements Hud.EventHandler {
 
 	///////////////
 	
@@ -250,7 +250,7 @@ public class App {
 	
 	private void setupHud() throws Exception {
 		String seedInfo = "Map seed: " + spec.randSeed; 
-		hud = new Hud(seedInfo);		
+		hud = new Hud(seedInfo, this);		
 	}
 	
 	private void setupSkybox() throws Exception {
@@ -299,6 +299,7 @@ public class App {
 		while (!wnd.shouldClose()) {
 			input.process();
 			resize();
+			processUI();
 			updateCamera(input);
 			renderer.render(scene, mapScene, skybox, hud, wnd, camera);
 			wnd.update();
@@ -326,6 +327,11 @@ public class App {
 		}
     }
 	
+    private void processUI() {
+    	if (input.isLeftButtonPressed())
+    		hud.onMouseDown(input.mousePosition());
+    }
+    
     private void updateCamera(InputProcessor input) {
         // Update camera based on keys.          
         final float CAMERA_POS_STEP = 0.2f;
@@ -350,6 +356,11 @@ public class App {
 //        camera.movePosition(lightDelta.x, lightDelta.y, lightDelta.z);
     }
 	
+    public void onReset()
+    {
+    	System.out.println("Reset called!");
+    }
+    
 	public static void main(String[] args) {
 		try {
 			new App().run();

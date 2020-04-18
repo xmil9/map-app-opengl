@@ -34,11 +34,11 @@ public class FontTexture {
             this.width = width;
         }
 
-        public int getStartX() {
+        public int startX() {
             return startX;
         }
 
-        public int getWidth() {
+        public int width() {
             return width;
         }
     }
@@ -103,7 +103,7 @@ public class FontTexture {
             // Get the size for each character and update global image size
             CharInfo charInfo = new CharInfo(width, fontMetrics.charWidth(c));
             charMap.put(c, charInfo);
-            width += charInfo.getWidth() + CHAR_PADDING;
+            width += charInfo.width() + CHAR_PADDING;
         }
         g2D.dispose();
 
@@ -118,7 +118,7 @@ public class FontTexture {
         for (char c : allChars.toCharArray()) {
             CharInfo charInfo = charMap.get(c);
             g2D.drawString("" + c, startX, fontMetrics.getAscent());
-            startX += charInfo.getWidth() + CHAR_PADDING;
+            startX += charInfo.width() + CHAR_PADDING;
         }
         g2D.dispose();
 

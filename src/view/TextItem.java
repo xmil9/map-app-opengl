@@ -11,10 +11,10 @@ import java.util.List;
 
 import org.joml.Vector3f;
 
-public class TextItem extends RenderedItem {
+public class TextItem extends UIItem {
 
     private static final float ZPOS = 0.0f;
-    private static final int VERTICES_PER_QUAD = 4;
+    private static final int VERTICES_PER_CHAR = 4;
     private String text;
     private Vector3f pos;
     private final FontTexture fontTex;
@@ -80,6 +80,18 @@ public class TextItem extends RenderedItem {
 		
 		shape.cleanup();
 	}
+	
+    @Override
+    public float width() {
+    	float lastCharWidth = (text.length() > 0) ?
+    			fontTex.charInfo(text.charAt(text.length()-1)).width() : 0;
+    	return (shape.dimensions().x + lastCharWidth) * scale();
+    }
+	
+    @Override
+    public float height() {
+    	return (shape.dimensions().y + fontTex.height()) * scale();
+    }
     
     private Mesh makeShape() {
         List<Float> positions = new ArrayList<>();
@@ -93,45 +105,47 @@ public class TextItem extends RenderedItem {
         for(int i=0; i<numChars; i++) {
             FontTexture.CharInfo charInfo = fontTex.charInfo(characters[i]);
             
-            // Build a character tile composed by two triangles
+            // Build a character tile composed by two triangles.
             
-            // Left Top vertex
-            positions.add(startx); // x
-            positions.add(0.0f); //y
-            positions.add(ZPOS); //z
-            textCoords.add( (float)charInfo.getStartX() / (float)fontTex.width());
+            // Left-top vertex.
+            positions.add(startx);
+            positions.add(0.0f);
+            positions.add(ZPOS);
+            textCoords.add( (float)charInfo.startX() / (float)fontTex.width());
             textCoords.add(0.0f);
-            indices.add(i*VERTICES_PER_QUAD);
                         
-            // Left Bottom vertex
-            positions.add(startx); // x
-            positions.add((float)fontTex.height()); //y
-            positions.add(ZPOS); //z
-            textCoords.add((float)charInfo.getStartX() / (float)fontTex.width());
+            // Left-bottom vertex.
+            positions.add(startx);
+            positions.add((float)fontTex.height());
+            positions.add(ZPOS);
+            textCoords.add((float)charInfo.startX() / (float)fontTex.width());
             textCoords.add(1.0f);
-            indices.add(i*VERTICES_PER_QUAD + 1);
 
-            // Right Bottom vertex
-            positions.add(startx + charInfo.getWidth()); // x
-            positions.add((float)fontTex.height()); //y
-            positions.add(ZPOS); //z
-            textCoords.add((float)(charInfo.getStartX() + charInfo.getWidth() )/ (float)fontTex.width());
+            // Right-bottom vertex.
+            positions.add(startx + charInfo.width());
+            positions.add((float)fontTex.height());
+            positions.add(ZPOS);
+            textCoords.add((float)(charInfo.startX() + charInfo.width() )/ (float)fontTex.width());
             textCoords.add(1.0f);
-            indices.add(i*VERTICES_PER_QUAD + 2);
 
-            // Right Top vertex
-            positions.add(startx + charInfo.getWidth()); // x
-            positions.add(0.0f); //y
-            positions.add(ZPOS); //z
-            textCoords.add((float)(charInfo.getStartX() + charInfo.getWidth() )/ (float)fontTex.width());
+            // Right-top vertex.
+            positions.add(startx + charInfo.width());
+            positions.add(0.0f);
+            positions.add(ZPOS);
+            textCoords.add((float)(charInfo.startX() + charInfo.width() )/ (float)fontTex.width());
             textCoords.add(0.0f);
-            indices.add(i*VERTICES_PER_QUAD + 3);
             
-            // Add indices por left top and bottom right vertices
-            indices.add(i*VERTICES_PER_QUAD);
-            indices.add(i*VERTICES_PER_QUAD + 2);
+            // Add indices for both triangles.
+            // 1: left-top, left-bottom, right-bottom
+            indices.add(i*VERTICES_PER_CHAR);
+            indices.add(i*VERTICES_PER_CHAR + 1);
+            indices.add(i*VERTICES_PER_CHAR + 2);
+            // 2: right-top, left-top, right-bottom
+            indices.add(i*VERTICES_PER_CHAR + 3);
+            indices.add(i*VERTICES_PER_CHAR);
+            indices.add(i*VERTICES_PER_CHAR + 2);
             
-            startx += charInfo.getWidth();
+            startx += charInfo.width();
         }
         
         return new Mesh(

@@ -11,22 +11,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2d;
 import org.joml.Vector4f;
 
 import app.Util;
 import ui.Window;
 
 public class Hud {
-    private static final Font FONT = new Font("Consolas", Font.PLAIN, 20);
+	
+	///////////////
+	
+	public static interface EventHandler {
+		public void onReset();
+	}
+	
+	///////////////
+
+	private static final Font FONT = new Font("Consolas", Font.PLAIN, 20);
     private static final String CHARSET = "ISO-8859-1";
-    private final List<RenderedItem> items = new ArrayList<RenderedItem>();
-    private final TextItem statusText;
+    private final List<UIItem> items = new ArrayList<UIItem>();
+    private final TextItem seedLabel;
+    private final ImageButtonItem resetButton;
+    private final EventHandler callbacks;
     private Shader shader;
 
-    public Hud(String statusText) throws Exception {
-        this.statusText = new TextItem(statusText, new FontTexture(FONT, CHARSET));
-        this.statusText.material().setAmbientColor(new Vector4f(0.8f, 0.8f, 0.8f, 1));
-        this.items.add(this.statusText);
+    public Hud(String seedText, EventHandler callbacks) throws Exception {
+    	this.callbacks = callbacks;
+        this.seedLabel = new TextItem(seedText, new FontTexture(FONT, CHARSET));
+        this.seedLabel.material().setAmbientColor(new Vector4f(0.8f, 0.8f, 0.8f, 1));
+        this.items.add(this.seedLabel);
+        
+        this.resetButton = new ImageButtonItem(
+        		new Texture("res/textures/reset.png"),
+        		() -> this.callbacks.onReset());
+        this.items.add(this.resetButton);
+
         this.shader = makeHudShader();
     }
 	
@@ -41,15 +60,16 @@ public class Hud {
 	}
 
     public void setStatusText(String statusText) {
-        this.statusText.setText(statusText);
+        this.seedLabel.setText(statusText);
     }
 
-    public List<RenderedItem> items() {
+    public List<UIItem> items() {
         return items;
     }
     
     public void resize(Window window) {
-        statusText.setPosition(10f, 20f, 0);
+        seedLabel.setPosition(10f, 20f, 0);
+        resetButton.setPosition(seedLabel.width() + 10f, 15f, 0);
     }
     
     public void render(Matrix4f projMat) {
@@ -67,7 +87,16 @@ public class Hud {
     public void cleanup() {
 		if (shader != null)
 			shader.cleanup();
-		for (RenderedItem item : items)
+		for (UIItem item : items)
 			item.cleanup();
-   }
+    }
+    
+    public void onMouseDown(Vector2d mousePos) {
+    	for (UIItem item : items) {
+    		if (item.hitTest(mousePos)) {
+    			item.onMouseDown(mousePos);
+    			break;
+    		}
+    	}
+    }
 }
