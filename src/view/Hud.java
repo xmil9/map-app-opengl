@@ -20,7 +20,7 @@ public class Hud {
 	
 	///////////////
 	
-	public static interface EventHandler {
+	public static interface UIEventHandler {
 		public void onReset();
 	}
 	
@@ -31,19 +31,23 @@ public class Hud {
     private final List<UIItem> items = new ArrayList<UIItem>();
     private final TextItem seedLabel;
     private final ImageButtonItem resetButton;
-    private final EventHandler callbacks;
+    private final UIEventHandler callbacks;
     private Shader shader;
     private MouseState lastMouseState = new MouseState();
     private UIItem lastTouchedItem;
 
-    public Hud(String seedText, EventHandler callbacks) throws Exception {
+    public Hud(String seedText, UIEventHandler callbacks) throws Exception {
     	this.callbacks = callbacks;
         this.seedLabel = new TextItem(seedText, new FontTexture(FONT, CHARSET));
         this.seedLabel.material().setAmbientColor(new Vector4f(0.8f, 0.8f, 0.8f, 1));
         this.items.add(this.seedLabel);
         
         this.resetButton = new ImageButtonItem(
-        		new Texture("res/textures/reset_normal.png"),
+        		new ImageButtonItem.Textures(
+        				new Texture("res/textures/reset_normal.png"),
+        				new Texture("res/textures/reset_focused.png"),
+        				new Texture("res/textures/reset_pressed.png"),
+        				new Texture("res/textures/reset_disabled.png")),
         		() -> this.callbacks.onReset());
         this.items.add(this.resetButton);
 
@@ -96,7 +100,7 @@ public class Hud {
     	if (curState.equals(lastMouseState))
     		return;
     	
-    	boolean posChanged = curState.pos.equals(lastMouseState.pos);
+    	boolean posChanged = !curState.pos.equals(lastMouseState.pos);
     	boolean leftButtonChanged =
     			curState.leftButtonDown != lastMouseState.leftButtonDown;
     	boolean rightButtonChanged =

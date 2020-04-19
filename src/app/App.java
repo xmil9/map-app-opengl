@@ -39,7 +39,7 @@ import java.nio.IntBuffer;
 import java.util.Random;
 
 // Main application.
-public class App implements Hud.EventHandler {
+public class App implements Hud.UIEventHandler {
 
 	///////////////
 	

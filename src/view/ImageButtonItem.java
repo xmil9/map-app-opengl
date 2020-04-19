@@ -15,19 +15,48 @@ public class ImageButtonItem extends UIItem {
 	
 	///////////////
 	
+	public static class Textures {
+		public final Texture normal;
+		public final Texture focused;
+		public final Texture pressed;
+		public final Texture disabled;
+		
+		public Textures(Texture normal, Texture focused, Texture pressed,
+				Texture disabled) {
+			this.normal = normal;
+			this.focused = focused;
+			this.pressed = pressed;
+			this.disabled = disabled;
+		}
+		
+		public Textures(Texture normal, Texture focused, Texture pressed) {
+			this(normal, focused, pressed, null);
+		}
+		
+		public Textures(Texture normal, Texture focused) {
+			this(normal, focused, null, null);
+		}
+		
+		public Textures(Texture normal) {
+			this(normal, null, null, null);
+		}
+	}
+	
+	///////////////
+	
     private static final float ZPOS = 0.0f;
     private Vector3f pos;
-    private final Texture imageTex;
+    private final Textures imageTexs;
     private Mesh shape;
     private final Material material;
     private final EventHandler callbacks;
     
-    public ImageButtonItem(Texture imageTex, EventHandler callbacks) throws Exception {
+    public ImageButtonItem(Textures texs, EventHandler callbacks) throws Exception {
         super();
         this.pos = new Vector3f(0, 0, 0);
-        this.imageTex = imageTex;
+        this.imageTexs = texs;
         this.shape = makeShape();
-        this.material = new Material(this.imageTex);
+        this.material = new Material(texs.normal);
         this.callbacks = callbacks;
     }
     
@@ -83,8 +112,34 @@ public class ImageButtonItem extends UIItem {
     }
     
     @Override
+    public void onMouseEntered(MouseState curState) {
+    	material.setTexture(imageTexs.focused);
+    }
+    
+    @Override
+    public void onMouseExited(MouseState curState) {
+    	material.setTexture(imageTexs.normal);
+    }
+    
+    @Override
+    public void onMouseMoved(MouseState curState) {
+    	material.setTexture(curState.leftButtonDown ?
+    			imageTexs.pressed : imageTexs.focused);
+    }
+    
+    @Override
+    public void onMouseButtonDown(MouseState.Button button, MouseState curState) {
+    	if (button == MouseState.Button.Left) {
+	    	material.setTexture(imageTexs.pressed);
+    	}
+    }
+    
+    @Override
     public void onMouseButtonUp(MouseState.Button button, MouseState curState) {
-    	callbacks.onPressed();
+    	if (button == MouseState.Button.Left) {
+	    	material.setTexture(imageTexs.focused);
+	    	callbacks.onPressed();
+    	}
     }
     
     private Mesh makeShape() {
@@ -104,20 +159,20 @@ public class ImageButtonItem extends UIItem {
                     
         // Left-bottom vertex.
         positions.add(0.0f);
-        positions.add((float)imageTex.height());
+        positions.add((float) imageTexs.normal.height());
         positions.add(ZPOS);
         texCoords.add(0.0f);
         texCoords.add(1.0f);
 
         // Right-bottom vertex.
-        positions.add((float)imageTex.width());
-        positions.add((float)imageTex.height());
+        positions.add((float) imageTexs.normal.width());
+        positions.add((float) imageTexs.normal.height());
         positions.add(ZPOS);
         texCoords.add(1.0f);
         texCoords.add(1.0f);
 
         // Right-top vertex.
-        positions.add((float)imageTex.width());
+        positions.add((float) imageTexs.normal.width());
         positions.add(0.0f);
         positions.add(ZPOS);
         texCoords.add(1.0f);
