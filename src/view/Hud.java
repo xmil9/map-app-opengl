@@ -42,7 +42,7 @@ public class Hud {
         this.items.add(this.seedLabel);
         
         this.resetButton = new ImageButtonItem(
-        		new Texture("res/textures/reset.png"),
+        		new Texture("res/textures/reset_normal.png"),
         		() -> this.callbacks.onReset());
         this.items.add(this.resetButton);
 
