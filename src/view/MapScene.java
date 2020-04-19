@@ -30,6 +30,11 @@ public class MapScene {
 		items.add(item);
 	}
     
+	public void clear() {
+		cleanupItems();
+		items.clear();
+	}
+	
     public void render(Matrix4f projMat, Matrix4f viewMat) {
         shader.bind();
         shader.setUniform("projectionMatrix", projMat);
@@ -45,6 +50,10 @@ public class MapScene {
     public void cleanup() {
 		if (shader != null)
 			shader.cleanup();
+		cleanupItems();
+    }
+    
+    private void cleanupItems() {
 		for (RenderedItem item : items)
 			item.cleanup();
     }

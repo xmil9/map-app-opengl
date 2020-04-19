@@ -150,10 +150,15 @@ public class App implements Hud.UIEventHandler {
 	}
 	
 	private void setupRandomization() {
+		spec.randSeed = resetRandomization(spec.randSeed);
+	}
+	
+	private long resetRandomization(Long seed) {
 		// Generate a random seed if none is given. 
-		if (spec.randSeed == null)
-			spec.randSeed = Math.abs(new Random().nextLong());
-		rand = new Random(spec.randSeed);
+		if (seed == null)
+			seed = Math.abs(new Random().nextLong());
+		rand = new Random(seed);
+		return seed;
 	}
 	
 	private void setupGlfw() {
@@ -249,8 +254,11 @@ public class App implements Hud.UIEventHandler {
 	}
 	
 	private void setupHud() throws Exception {
-		String seedInfo = "Map seed: " + spec.randSeed; 
-		hud = new Hud(seedInfo, this);		
+		hud = new Hud(makeSeedInfo(spec.randSeed), this);		
+	}
+	
+	private static String makeSeedInfo(long seed) {
+		return "Map seed: " + seed;
 	}
 	
 	private void setupSkybox() throws Exception {
@@ -260,6 +268,8 @@ public class App implements Hud.UIEventHandler {
 	}
 	
 	private void computeMap() throws Exception	{
+		mapScene.clear();
+		
 		map.Map map = new map.Map(makeModelSpec(spec), rand);
 		map.generate();
 		Mesh mapMesh = new MapMeshBuilder(map, makeMeshBuilderSpec(spec)).build();
@@ -357,7 +367,13 @@ public class App implements Hud.UIEventHandler {
 	
     public void onReset()
     {
-    	System.out.println("Reset called!");
+    	try {
+			long seed = resetRandomization(null);
+			computeMap();
+			hud.setStatusText(makeSeedInfo(seed));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     }
     
 	public static void main(String[] args) {
