@@ -4,11 +4,12 @@
 // The original code has been modified to suit this project.
 //
 
-package ui;
+package view;
 
 import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class InputProcessor {
@@ -117,5 +118,9 @@ public class InputProcessor {
     
     public Vector2d mousePosition() {
     	return curMousePos;
+    }
+    
+    public MouseState mouseState() {
+    	return new MouseState(curMousePos, isLeftButtonPressed, isRightButtonPressed);
     }
 }

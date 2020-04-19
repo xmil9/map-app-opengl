@@ -3,7 +3,6 @@ package view;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joml.Vector2d;
 import org.joml.Vector3f;
 
 public class ImageButtonItem extends UIItem {
@@ -83,8 +82,8 @@ public class ImageButtonItem extends UIItem {
     	return shape.dimensions().y * scale();
     }
     
-    public void onMouseDown(Vector2d pos)
-    {
+    @Override
+    public void onMouseButtonUp(MouseState.Button button, MouseState curState) {
     	callbacks.onPressed();
     }
     

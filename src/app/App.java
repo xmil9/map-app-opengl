@@ -12,11 +12,11 @@ import map.Map;
 import map.MapGeometryGenerator;
 import map.PerlinTopography;
 import types.Pair;
-import ui.AppWindow;
-import ui.InputProcessor;
+import view.AppWindow;
 import view.Camera;
 import view.DirectionalLight;
 import view.Hud;
+import view.InputProcessor;
 import view.MapItem;
 import view.MapMeshBuilder;
 import view.MapScene;
@@ -328,8 +328,7 @@ public class App implements Hud.EventHandler {
     }
 	
     private void processUI() {
-    	if (input.isLeftButtonPressed())
-    		hud.onMouseDown(input.mousePosition());
+    	hud.processMouse(input.mouseState());
     }
     
     private void updateCamera(InputProcessor input) {

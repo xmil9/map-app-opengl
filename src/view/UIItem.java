@@ -15,8 +15,18 @@ public abstract class UIItem extends RenderedItem {
 		return horzHit && vertHit;
 	}
 	
-	public void onMouseDown(Vector2d pos)
-	{
-		// Do nothing by default.
+	public void onMouseEntered(MouseState curState)	{
+	}
+	
+	public void onMouseExited(MouseState curState)	{
+	}
+	
+	public void onMouseMoved(MouseState curState)	{
+	}
+	
+	public void onMouseButtonDown(MouseState.Button button, MouseState curState) {
+	}
+	
+	public void onMouseButtonUp(MouseState.Button button, MouseState curState) {
 	}
 }

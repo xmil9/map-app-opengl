@@ -15,7 +15,6 @@ import org.joml.Vector2d;
 import org.joml.Vector4f;
 
 import app.Util;
-import ui.Window;
 
 public class Hud {
 	
@@ -34,6 +33,8 @@ public class Hud {
     private final ImageButtonItem resetButton;
     private final EventHandler callbacks;
     private Shader shader;
+    private MouseState lastMouseState = new MouseState();
+    private UIItem lastTouchedItem;
 
     public Hud(String seedText, EventHandler callbacks) throws Exception {
     	this.callbacks = callbacks;
@@ -91,12 +92,51 @@ public class Hud {
 			item.cleanup();
     }
     
-    public void onMouseDown(Vector2d mousePos) {
-    	for (UIItem item : items) {
-    		if (item.hitTest(mousePos)) {
-    			item.onMouseDown(mousePos);
-    			break;
+    public void processMouse(MouseState curState) {
+    	if (curState.equals(lastMouseState))
+    		return;
+    	
+    	boolean posChanged = curState.pos.equals(lastMouseState.pos);
+    	boolean leftButtonChanged =
+    			curState.leftButtonDown != lastMouseState.leftButtonDown;
+    	boolean rightButtonChanged =
+    			curState.rightButtonDown != lastMouseState.rightButtonDown;
+    	
+    	UIItem curItem = findHitItem(curState.pos);
+    	
+    	if (curItem != lastTouchedItem) {
+        	if (lastTouchedItem != null)
+    			lastTouchedItem.onMouseExited(curState);
+    		if (curItem != null)
+    			curItem.onMouseEntered(curState);
+    	}
+
+    	if (curItem != null) {
+    		if (posChanged)
+    			curItem.onMouseMoved(curState);
+    		if (leftButtonChanged) {
+    			if (curState.leftButtonDown)
+    				curItem.onMouseButtonDown(MouseState.Button.Left, curState);
+    			else
+    				curItem.onMouseButtonUp(MouseState.Button.Left, curState);
+    		}
+    		if (rightButtonChanged) {
+    			if (curState.rightButtonDown)
+    				curItem.onMouseButtonDown(MouseState.Button.Right, curState);
+    			else
+    				curItem.onMouseButtonUp(MouseState.Button.Right, curState);
     		}
     	}
+    	
+    	lastMouseState = curState;
+    	lastTouchedItem = curItem;
+    }
+    
+    private UIItem findHitItem(Vector2d mousePos) {
+    	for (UIItem item : items) {
+    		if (item.hitTest(mousePos))
+    			return item;
+    	}
+    	return null;
     }
 }
