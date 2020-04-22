@@ -9,6 +9,7 @@ import org.lwjgl.system.MemoryStack;
 
 import geometry.Rect2D;
 import map.Map;
+import map.MapGenerator;
 import map.MapGeometryGenerator;
 import map.PerlinTopography;
 import types.Pair;
@@ -107,6 +108,8 @@ public class App implements Hud.UIEventHandler {
 	// App-wide random number generator. Must be used everywhere to guarantee
 	// deterministic map generation.
 	private Random rand;
+	private MapGenerator mapGen;
+	private Thread mapGenThread;
 
 	public void run() {
 		try {
@@ -123,6 +126,7 @@ public class App implements Hud.UIEventHandler {
 	private void setup() throws Exception {
 		setupSpec();
 		setupRandomization();
+		generateMap();
 		setupGlfw();
 		setupWindow();
 		setupContext();
@@ -159,6 +163,12 @@ public class App implements Hud.UIEventHandler {
 			seed = Math.abs(new Random().nextLong());
 		rand = new Random(seed);
 		return seed;
+	}
+	
+	private void generateMap() {
+		mapGen = new MapGenerator(makeModelSpec(spec), rand);
+		mapGenThread = new Thread(mapGen);
+		mapGenThread.start();
 	}
 	
 	private void setupGlfw() {
@@ -269,10 +279,15 @@ public class App implements Hud.UIEventHandler {
 	
 	private void computeMap() throws Exception	{
 		mapScene.clear();
+
+		if (mapGenThread == null)
+			generateMap();
+		mapGenThread.join();
 		
-		map.Map map = new map.Map(makeModelSpec(spec), rand);
-		map.generate();
-		Mesh mapMesh = new MapMeshBuilder(map, makeMeshBuilderSpec(spec)).build();
+		Mesh mapMesh = new MapMeshBuilder(mapGen.map(), makeMeshBuilderSpec(spec)).build();
+		mapGenThread = null;
+		mapGen = null;
+		
 		Vector4f mapColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
 		float mapReflectance = 0.3f;
         MapItem mapItem = new MapItem(mapMesh, new Material(mapColor, mapReflectance));
