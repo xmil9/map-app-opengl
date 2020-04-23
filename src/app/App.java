@@ -108,13 +108,13 @@ public class App implements Hud.UIEventHandler {
 	// App-wide random number generator. Must be used everywhere to guarantee
 	// deterministic map generation.
 	private Random rand;
+	private boolean hasMapGenerationStarted = false;
 	private MapGenerator mapGen;
 	private Thread mapGenThread;
 
 	public void run() {
 		try {
 			setup();
-			computeMap();
 			loop();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -126,7 +126,7 @@ public class App implements Hud.UIEventHandler {
 	private void setup() throws Exception {
 		setupSpec();
 		setupRandomization();
-		generateMap();
+		startMapGeneration();
 		setupGlfw();
 		setupWindow();
 		setupContext();
@@ -165,10 +165,41 @@ public class App implements Hud.UIEventHandler {
 		return seed;
 	}
 	
-	private void generateMap() {
+	private void startMapGeneration() {
 		mapGen = new MapGenerator(makeModelSpec(spec), rand);
 		mapGenThread = new Thread(mapGen);
 		mapGenThread.start();
+		hasMapGenerationStarted = true;
+	}
+	
+	private void cleanupMapGeneration() {
+		mapGen = null;
+		mapGenThread = null;
+	}
+	
+	private boolean hasMapGenerationFinished() {
+		if (!hasMapGenerationStarted)
+			return false;
+		return !mapGenThread.isAlive();
+	}
+	
+	private void checkMapGeneration() {
+		if (hasMapGenerationStarted && hasMapGenerationFinished()) {
+			hasMapGenerationStarted = false;
+			createMapItem();
+			cleanupMapGeneration();
+		}
+	}
+	
+	private void createMapItem() {
+		Mesh mapMesh = new MapMeshBuilder(mapGen.map(), makeMeshBuilderSpec(spec)).build();
+		Vector4f mapColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
+		float mapReflectance = 0.3f;
+        MapItem mapItem = new MapItem(mapMesh, new Material(mapColor, mapReflectance));
+        mapItem.setPosition(-50, -40, -180);
+        mapItem.setRotation(00, 0, 0);
+        mapItem.setScale(100f);
+		mapScene.addItem(mapItem);
 	}
 	
 	private void setupGlfw() {
@@ -277,47 +308,6 @@ public class App implements Hud.UIEventHandler {
 		 skybox.setScale(40.0f);
 	}
 	
-	private void computeMap() throws Exception	{
-		mapScene.clear();
-
-		if (mapGenThread == null)
-			generateMap();
-		mapGenThread.join();
-		
-		Mesh mapMesh = new MapMeshBuilder(mapGen.map(), makeMeshBuilderSpec(spec)).build();
-		mapGenThread = null;
-		mapGen = null;
-		
-		Vector4f mapColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
-		float mapReflectance = 0.3f;
-        MapItem mapItem = new MapItem(mapMesh, new Material(mapColor, mapReflectance));
-        mapItem.setPosition(-50, -40, -180);
-        mapItem.setRotation(00, 0, 0);
-        mapItem.setScale(100f);
-		mapScene.addItem(mapItem);
-		
-//		float cubeReflectance = 0.3f;
-//        MapItem cube = new MapItem(
-//        		ObjectLoader.loadMesh("/models/cube.obj"),
-//        		new Material(
-//        				new Texture("res/textures/grassblock.png"),
-//        				cubeReflectance));
-//        cube.setPosition(0, 0, -10);
-//        cube.setRotation(10, 20, 20);
-//        cube.setScale(0.8f);
-//		scene.addItem(cube);
-//
-//		float bunnyReflectance = 0.3f;
-//		Vector4f bunnyColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
-//		MapItem bunny = new MapItem(
-//				ObjectLoader.loadMesh("/models/bunny.obj"),
-//        		new Material(bunnyColor, bunnyReflectance));
-//		bunny.setPosition(5, 5, -10);
-//		bunny.setRotation(10, 20, 20);
-//		bunny.setScale(1.0f);
-//		scene.addItem(bunny);
-	}
-	
 	private void loop() throws Exception {
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
@@ -326,6 +316,7 @@ public class App implements Hud.UIEventHandler {
 			resize();
 			processUI();
 			updateCamera(input);
+			checkMapGeneration();
 			renderer.render(scene, mapScene, skybox, hud, wnd, camera);
 			wnd.update();
 		}
@@ -384,7 +375,8 @@ public class App implements Hud.UIEventHandler {
     {
     	try {
 			long seed = resetRandomization(null);
-			computeMap();
+			mapScene.clear();
+			startMapGeneration();
 			hud.setStatusText(makeSeedInfo(seed));
 		} catch (Exception e) {
 			e.printStackTrace();
