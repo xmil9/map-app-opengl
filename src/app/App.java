@@ -49,7 +49,7 @@ public class App implements Hud.UIEventHandler {
 		
 		// View specs.
 		public int viewWidth = 1700;
-		public int viewHeight = 1200;
+		public int viewHeight = 1000;
 		public TileColorPolicy tileColorPolicy = TileColorPolicy.ASSIGN_TILE_SEED_COLORS;
 		public boolean haveBeaches = false;
 		// Measure for steepness of map features.
@@ -111,6 +111,7 @@ public class App implements Hud.UIEventHandler {
 	private boolean hasMapGenerationStarted = false;
 	private MapGenerator mapGen;
 	private Thread mapGenThread;
+	private MapItem placeholderItem;
 
 	public void run() {
 		try {
@@ -137,6 +138,7 @@ public class App implements Hud.UIEventHandler {
 		setupSkybox();
 		input.setup(wnd);
 		renderer.setup(wnd);
+		setupPlaceholderItem();
 		wnd.show();
 	}
 
@@ -184,10 +186,13 @@ public class App implements Hud.UIEventHandler {
 	}
 	
 	private void checkMapGeneration() {
-		if (hasMapGenerationStarted && hasMapGenerationFinished()) {
-			hasMapGenerationStarted = false;
-			createMapItem();
-			cleanupMapGeneration();
+		if (hasMapGenerationStarted) {
+			if (hasMapGenerationFinished()) {
+				hasMapGenerationStarted = false;
+				mapScene.removeItem(placeholderItem);
+				createMapItem();
+				cleanupMapGeneration();
+			}
 		}
 	}
 	
@@ -200,6 +205,34 @@ public class App implements Hud.UIEventHandler {
         mapItem.setRotation(00, 0, 0);
         mapItem.setScale(100f);
 		mapScene.addItem(mapItem);
+	}
+	
+	private void setupPlaceholderItem() {
+		placeholderItem = createPlaceholderItem();
+		mapScene.addItem(placeholderItem);
+	}
+	
+	private static MapItem createPlaceholderItem() {
+		Rect2D bounds = new Rect2D(0, 0, 20, 20);
+		Map.Spec placeholderSpec = new Map.Spec(
+				new MapGeometryGenerator.Spec(bounds, 1, 10),
+				new PerlinTopography.Spec(bounds, 4, 2));
+		
+		MapGenerator placeholderGen = new MapGenerator(placeholderSpec, new Random());
+		placeholderGen.run();
+		
+		float elevRange3D = 3f / (float) Math.max(20, 20);
+		MapMeshBuilder.Spec meshSpec = new MapMeshBuilder.Spec(
+				TileColorPolicy.ASSIGN_TILE_SEED_COLORS, elevRange3D, 0.5f, false);
+		Mesh mapMesh = new MapMeshBuilder(placeholderGen.map(), meshSpec).build();
+		Vector4f mapColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
+		float mapReflectance = 0.0f;
+        MapItem placeholderItem = new MapItem(mapMesh, new Material(mapColor, mapReflectance));
+        placeholderItem.setPosition(-50, -40, -180);
+        placeholderItem.setRotation(0, 0, 0);
+        placeholderItem.setScale(50f);
+        
+        return placeholderItem;
 	}
 	
 	private void setupGlfw() {
@@ -376,6 +409,7 @@ public class App implements Hud.UIEventHandler {
     	try {
 			long seed = resetRandomization(null);
 			mapScene.clear();
+			mapScene.addItem(placeholderItem);
 			startMapGeneration();
 			hud.setStatusText(makeSeedInfo(seed));
 		} catch (Exception e) {

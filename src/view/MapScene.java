@@ -30,6 +30,14 @@ public class MapScene {
 		items.add(item);
 	}
     
+	public void removeItem(RenderedItem item) {
+		items.remove(item);
+	}
+	
+	public int countItems() {
+		return items.size();
+	}
+	
 	public void clear() {
 		cleanupItems();
 		items.clear();
