@@ -16,19 +16,24 @@ import types.Pair;
 import view.AppWindow;
 import view.Camera;
 import view.DirectionalLight;
+import view.GrayscaleColorTheme;
 import view.Hud;
 import view.InputProcessor;
+import view.MapColorPolicy;
+import view.MapColorTheme;
 import view.MapItem;
 import view.MapMeshBuilder;
 import view.MapScene;
 import view.Material;
 import view.Mesh;
+import view.NodeElevationColorTheme;
+import view.PlaceholderMapItem;
 import view.PointLight;
 import view.Renderer;
 import view.Scene;
+import view.SeedElevationColorTheme;
 import view.Skybox;
 import view.SpotLight;
-import view.TileColorPolicy;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.GL_VIEWPORT;
@@ -44,13 +49,13 @@ public class App implements Hud.UIEventHandler {
 
 	///////////////
 	
-	public class Spec {
+	public static class Spec {
 		public Long randSeed = 1234567890L;
 		
 		// View specs.
 		public int viewWidth = 1700;
 		public int viewHeight = 1000;
-		public TileColorPolicy tileColorPolicy = TileColorPolicy.ASSIGN_TILE_SEED_COLORS;
+		public MapColorPolicy mapColorPolicy = MapColorPolicy.SeedElevationColors;
 		public boolean haveBeaches = false;
 		// Measure for steepness of map features.
 		// Larger => steeper map.
@@ -62,8 +67,8 @@ public class App implements Hud.UIEventHandler {
 		public float surfaceElevRatio3D = 0.6f;
 		
 		// Model specs.
-		public int mapWidth = 500;
-		public int mapHeight = 500;
+		public int mapWidth = 1000;
+		public int mapHeight = 1000;
 		// Smaller distance => smaller and more tiles.
 		public double minSampleDistance = 1;
 		// More candidates => more evenly spaced sample points but slower generation.
@@ -87,11 +92,38 @@ public class App implements Hud.UIEventHandler {
 						appSpec.persistence));
 	}
 	
-	private static MapMeshBuilder.Spec makeMeshBuilderSpec(Spec spec) {
-		float elevRange3D = spec.elevScale3D / (float) Math.max(
-				spec.mapWidth, spec.mapHeight);
-		return new MapMeshBuilder.Spec(spec.tileColorPolicy, elevRange3D,
-				spec.surfaceElevRatio3D, spec.haveBeaches);
+	private static MapMeshBuilder.Spec makeMeshBuilderSpec(Spec spec, Random rand) {
+		float elevRange = calcElevationRange(spec);
+		return new MapMeshBuilder.Spec(
+				makeColorTheme(spec, rand),
+				elevRange,
+				spec.surfaceElevRatio3D,
+				spec.haveBeaches);
+	}
+	
+	private static MapColorTheme makeColorTheme(Spec spec, Random rand) {
+		float elevMin = calcElevationMin(spec);
+		float elevRange = calcElevationRange(spec);
+		
+		switch (spec.mapColorPolicy) {
+		case NodeElevationColors:
+			return new NodeElevationColorTheme(elevMin, elevRange, spec.surfaceElevRatio3D,
+					spec.haveBeaches);
+		default:
+		case SeedElevationColors:
+			return new SeedElevationColorTheme(elevMin, elevRange, spec.surfaceElevRatio3D,
+					spec.haveBeaches);
+		case GrayscaleColors:
+			return new GrayscaleColorTheme(rand);
+		}
+	}
+	
+	private static float calcElevationRange(Spec spec) {
+		return spec.elevScale3D / Math.max(spec.mapWidth, spec.mapHeight);
+	}
+
+	private static float calcElevationMin(Spec spec) {
+		return -calcElevationRange(spec) / 2f;
 	}
 	
 	///////////////
@@ -192,17 +224,22 @@ public class App implements Hud.UIEventHandler {
 				mapScene.removeItem(placeholderItem);
 				createMapItem();
 				cleanupMapGeneration();
+			} else {
+				animatePlaceholderMap();
 			}
 		}
 	}
 	
 	private void createMapItem() {
-		Mesh mapMesh = new MapMeshBuilder(mapGen.map(), makeMeshBuilderSpec(spec)).build();
+		Mesh mapMesh = new MapMeshBuilder(
+				mapGen.map(),
+				makeMeshBuilderSpec(spec, rand)
+				).build();
 		Vector4f mapColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
 		float mapReflectance = 0.3f;
         MapItem mapItem = new MapItem(mapMesh, new Material(mapColor, mapReflectance));
         mapItem.setPosition(-50, -40, -180);
-        mapItem.setRotation(00, 0, 0);
+        mapItem.setRotation(0, 0, 0);
         mapItem.setScale(100f);
 		mapScene.addItem(mapItem);
 	}
@@ -213,26 +250,52 @@ public class App implements Hud.UIEventHandler {
 	}
 	
 	private static MapItem createPlaceholderItem() {
-		Rect2D bounds = new Rect2D(0, 0, 20, 20);
-		Map.Spec placeholderSpec = new Map.Spec(
-				new MapGeometryGenerator.Spec(bounds, 1, 10),
-				new PerlinTopography.Spec(bounds, 4, 2));
+		Spec placeholderSpec = new Spec();
+		placeholderSpec.randSeed = 1000L;
+		placeholderSpec.viewWidth = 0;
+		placeholderSpec.viewHeight = 0;
+		placeholderSpec.mapColorPolicy = MapColorPolicy.GrayscaleColors;
+		placeholderSpec.haveBeaches = false;
+		placeholderSpec.elevScale3D = 2f;
+		placeholderSpec.surfaceElevRatio3D = 0.5f;
+		placeholderSpec.mapWidth = 20;
+		placeholderSpec.mapHeight = 20;
+		placeholderSpec.minSampleDistance = 1;
+		placeholderSpec.numSampleCandidates = 10;
+		placeholderSpec.numOctaves = 6;
+		placeholderSpec.persistence = 0.8f;
 		
-		MapGenerator placeholderGen = new MapGenerator(placeholderSpec, new Random());
+		Random placeholderRand = new Random(placeholderSpec.randSeed);
+		
+		MapGenerator placeholderGen = new MapGenerator(
+				makeModelSpec(placeholderSpec),
+				placeholderRand);
 		placeholderGen.run();
 		
-		float elevRange3D = 3f / (float) Math.max(20, 20);
-		MapMeshBuilder.Spec meshSpec = new MapMeshBuilder.Spec(
-				TileColorPolicy.ASSIGN_TILE_SEED_COLORS, elevRange3D, 0.5f, false);
-		Mesh mapMesh = new MapMeshBuilder(placeholderGen.map(), meshSpec).build();
+		Mesh mapMesh = new MapMeshBuilder(
+				placeholderGen.map(),
+				makeMeshBuilderSpec(placeholderSpec, placeholderRand)
+				).build();
+		
 		Vector4f mapColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
 		float mapReflectance = 0.0f;
-        MapItem placeholderItem = new MapItem(mapMesh, new Material(mapColor, mapReflectance));
-        placeholderItem.setPosition(-50, -40, -180);
+        
+		PlaceholderMapItem placeholderItem = new PlaceholderMapItem(
+        		mapMesh,
+        		new Material(mapColor, mapReflectance));
+        placeholderItem.setPosition(0, -40, -180);
         placeholderItem.setRotation(0, 0, 0);
-        placeholderItem.setScale(50f);
+        placeholderItem.setScale(40f);
         
         return placeholderItem;
+	}
+	
+	private void animatePlaceholderMap() {
+		Vector3f rot = placeholderItem.rotation();
+		placeholderItem.setRotation(
+				rot.x + (float) Math.toRadians(0.0f),
+				rot.y + (float) Math.toRadians(0.5f),
+				rot.z + (float) Math.toRadians(0.0f));
 	}
 	
 	private void setupGlfw() {

@@ -62,7 +62,13 @@ public class MapItem extends RenderedItem {
 		return new Vector3f(rot.x, rot.y, rot.z);
 	}
 	
-	public void setRotation(float degX, float degY, float degZ) {
+	public void setRotation(float x, float y, float z) {
+		rot.x = x;
+		rot.y = y;
+		rot.z = z;
+	}
+	
+	public void setRotationDegrees(float degX, float degY, float degZ) {
 		rot.x = (float) Math.toRadians(degX);
 		rot.y = (float) Math.toRadians(degY);
 		rot.z = (float) Math.toRadians(degZ);

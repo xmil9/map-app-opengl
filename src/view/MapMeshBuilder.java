@@ -16,14 +16,14 @@ public class MapMeshBuilder {
 	///////////////
 	
 	public static class Spec {
-		public TileColorPolicy colorPolicy;
+		public MapColorTheme colorTheme;
 		public float elevRange3D;
 		public float surfaceElevRatio3D;
 		public boolean haveBeaches;
 
-		public Spec(TileColorPolicy colorPolicy, float elevRange3D,
+		public Spec(MapColorTheme colorTheme, float elevRange3D,
 				float surfaceElevRatio3D, boolean haveBeaches) {
-			this.colorPolicy = colorPolicy;
+			this.colorTheme = colorTheme;
 			this.elevRange3D = elevRange3D;
 			this.surfaceElevRatio3D = surfaceElevRatio3D;
 			this.haveBeaches = haveBeaches;
@@ -189,44 +189,14 @@ public class MapMeshBuilder {
 	// Adds the color components for a given tile to the color list.
 	private void addTileColors(List<Float> vertices, int seedIdx,
 			List<Float> colors) {
-		switch (spec.colorPolicy) {
-		case BLEND_TILE_NODE_COLORS:
-			addTileColorsByNode(vertices, seedIdx, colors);
-			break;
-		default:
-		case ASSIGN_TILE_SEED_COLORS:
-			addTileColorsBySeed(vertices, seedIdx, colors);
-			break;
-		}
-	}
-	
-	// Adds the color components for a given tile to the color list. Uses the elevation
-	// of each individual node as base for the each node's color.
-	private void addTileColorsByNode(List<Float> vertices, int seedIdx,
-			List<Float> colors) {
 		int lastNodeIdx = lastVertexIndex(vertices);
-		
+
 		for (int i = seedIdx; i <= lastNodeIdx; ++i) {
-			int yCoordIdx = i * 3 + 1;
-			Triple<Float, Float, Float> color = interpolateColor(vertices.get(yCoordIdx));
+			Triple<Float, Float, Float> color = spec.colorTheme.getNodeColor(
+					vertices, i, seedIdx, lastNodeIdx);
 			colors.add(color.a);
 			colors.add(color.b);
 			colors.add(color.c);
-		}
-	}
-	
-	// Adds the color components for a given tile to the color list. Uses the seed's
-	// color for all nodes of the tile.
-	private void addTileColorsBySeed(List<Float> vertices, int seedIdx,
-			List<Float> colors) {
-		int seedYCoordIdx = seedIdx * 3 + 1;
-		Triple<Float, Float, Float> seedColor = interpolateColor(vertices.get(seedYCoordIdx));
-
-		int lastNodeIdx = lastVertexIndex(vertices);
-		for (int i = seedIdx; i <= lastNodeIdx; ++i) {
-			colors.add(seedColor.a);
-			colors.add(seedColor.b);
-			colors.add(seedColor.c);
 		}
 	}
 	
@@ -265,68 +235,5 @@ public class MapMeshBuilder {
 	// Returns the 3D z coordinate for a given 2D y coordinate.
 	private float interpolateZ(double y2D) {
 		return meshMinZ + meshSizeZ * (float) (y2D / map.height()); 
-	}
-	
-	// Returns a color for a given elevation.
-	// The range of the given elevation is [meshMinY, meshMinY + meshSizeY].
-	private Triple<Float, Float, Float> interpolateColor(float elev) {
-		float maxElev = meshMinY + meshSizeY;
-		float surfaceElev = meshMinY + spec.surfaceElevRatio3D * meshSizeY;
-		float landRange = maxElev - surfaceElev;
-		float beachElev = surfaceElev + 0.05f * landRange;
-		float humidElev = surfaceElev + 0.33f * landRange;
-		float aridElev = surfaceElev + 0.66f * landRange;
-		float rockyElev = surfaceElev + 0.90f * landRange;
-		
-		float r = 0;
-		float g = 0;
-		float b = 0;
-		if (elev < surfaceElev) {
-			// Blue water.
-			float elevMin = meshMinY;
-			float elevRange = surfaceElev - elevMin;
-			r = 0;
-			g = 0.5f * (elev - elevMin) / elevRange;
-			b = 1;
-		} else if (elev < beachElev && spec.haveBeaches) {
-			// Yellow beaches.
-			float elevMin = surfaceElev;
-			float elevRange = beachElev - elevMin;
-			r = 1f;
-			g = 0.95f - 0.08f * (elev - elevMin) / elevRange;
-			b = 0.5f;
-		} else if (elev < humidElev) {
-			// Green vegetation.
-			float elevMin = spec.haveBeaches ? beachElev : surfaceElev;
-			float elevRange = humidElev - elevMin;
-			r = 0.03f;
-			g = 0.34f +  0.3f * ((elev - elevMin) / elevRange);
-			b = 0;
-		} else if (elev < aridElev) {
-			// Brown grassland.
-			float elevMin = humidElev;
-			float elevRange = aridElev - elevMin;
-			r = 0.86f;
-			g = 0.8f - 0.3f * ((elev - elevMin) / elevRange);
-			b = 0;
-		} else if (elev < rockyElev) {
-			// Gray rocks.
-			float elevMin = aridElev;
-			float elevRange = rockyElev - elevMin;
-			float gray = 0.75f - 0.5f * ((elev - elevMin) / elevRange);
-			r = gray;
-			g = gray;
-			b = gray;
-		} else {
-			// White snow.
-			float elevMin = rockyElev;
-			float elevRange = maxElev - elevMin;
-			float gray = 0.85f + 0.15f * ((elev - elevMin) / elevRange);
-			r = gray;
-			g = gray;
-			b = gray;
-		}
-		
-		return new Triple<Float, Float, Float>(r, g, b);
 	}
 }
