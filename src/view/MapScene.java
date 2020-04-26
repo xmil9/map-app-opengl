@@ -27,11 +27,13 @@ public class MapScene {
 	}
 	
 	public void addItem(RenderedItem item) {
-		items.add(item);
+		if (item != null)
+			items.add(item);
 	}
     
 	public void removeItem(RenderedItem item) {
-		items.remove(item);
+		if (item != null)
+			items.remove(item);
 	}
 	
 	public int countItems() {

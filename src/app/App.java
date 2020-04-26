@@ -12,6 +12,7 @@ import map.Map;
 import map.MapGenerator;
 import map.MapGeometryGenerator;
 import map.PerlinTopography;
+import math.RandomGenerator;
 import types.Pair;
 import view.Camera;
 import view.DirectionalLight;
@@ -129,6 +130,10 @@ public class App implements UI.UIEventHandler {
 	
 	///////////////
 	
+	private Spec spec;
+	// App-wide random number generator. Must be used everywhere to guarantee
+	// deterministic map generation.
+	private RandomGenerator randGen;
 	private AppWindow wnd = new AppWindow();
 	private InputProcessor input = new InputProcessor();
 	private Renderer renderer = new Renderer();
@@ -137,10 +142,6 @@ public class App implements UI.UIEventHandler {
 	private MapScene mapScene;
 	private Skybox skybox;
 	private UI ui;
-	private Spec spec;
-	// App-wide random number generator. Must be used everywhere to guarantee
-	// deterministic map generation.
-	private Random rand;
 	private MapGenerationTask mapGen = new MapGenerationTask();
 	private MapItem placeholderItem;
 
@@ -187,52 +188,58 @@ public class App implements UI.UIEventHandler {
 	}
 	
 	private void setupRandomization() {
-		spec.randSeed = resetRandomization(spec.randSeed);
-	}
-	
-	private long resetRandomization(Long seed) {
-		// Generate a random seed if none is given. 
-		if (seed == null)
-			seed = Math.abs(new Random().nextLong());
-		rand = new Random(seed);
-		return seed;
+		if (spec.randSeed != 0)
+			randGen = new RandomGenerator(spec.randSeed);
+		else
+			randGen = new RandomGenerator();
 	}
 	
 	private void startMapGeneration() {
-		if (ui != null)
+		if (ui != null) {
+			ui.setSeedInfo(makeSeedInfo(randGen.seed()));
+			ui.setStatusText("Generating map...");
 			ui.enable(false);
-		mapGen.start(makeModelSpec(spec), rand);
+		}
+		
+		if (mapScene != null) {
+			mapScene.clear();
+			mapScene.addItem(placeholderItem);
+		}		
+		
+		mapGen.start(makeModelSpec(spec), randGen.rand());
 	}
 	
 	private void finishMapGeneration() {
+		mapScene.removeItem(placeholderItem);
+
+		createMapItem();
+		mapGen.clean();
+
 		if (ui != null) {
 			ui.setStatusText("");
 			ui.enable(true);
 		}
-		mapGen.clean();
 	}
 	
 	private void checkMapGeneration() {
-		if (mapGen.hasStarted()) {
-			if (mapGen.hasFinished()) {
-				mapScene.removeItem(placeholderItem);
-				createMapItem();
-				finishMapGeneration();
-			} else {
-				animatePlaceholderMap();
-			}
-		}
+		if (!mapGen.hasStarted())
+			return;
+		
+		if (mapGen.hasFinished())
+			finishMapGeneration();
+		else
+			animatePlaceholderMap();
 	}
 	
 	private void createMapItem() {
 		Mesh mapMesh = new MapMeshBuilder(
 				mapGen.map(),
-				makeMeshBuilderSpec(spec, rand)
+				makeMeshBuilderSpec(spec, randGen.rand())
 				).build();
 		Vector4f mapColor = new Vector4f(0.4f, 0.2f, 0.8f, 1.0f);
 		float mapReflectance = 0.3f;
         MapItem mapItem = new MapItem(mapMesh, new Material(mapColor, mapReflectance));
-        mapItem.setPosition(-50, -40, -180);
+        mapItem.setPosition(-50, -30, -180);
         mapItem.setRotation(0, 0, 0);
         mapItem.setScale(100f);
 		mapScene.addItem(mapItem);
@@ -277,7 +284,7 @@ public class App implements UI.UIEventHandler {
 		PlaceholderMapItem placeholderItem = new PlaceholderMapItem(
         		mapMesh,
         		new Material(mapColor, mapReflectance));
-        placeholderItem.setPosition(0, -40, -180);
+        placeholderItem.setPosition(0, -30, -180);
         placeholderItem.setRotation(0, 0, 0);
         placeholderItem.setScale(40f);
         
@@ -465,16 +472,8 @@ public class App implements UI.UIEventHandler {
 	
     public void onReset()
     {
-    	try {
-			long seed = resetRandomization(null);
-			mapScene.clear();
-			mapScene.addItem(placeholderItem);
-			startMapGeneration();
-			ui.setSeedInfo(makeSeedInfo(seed));
-			ui.setStatusText("Generating map...");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    	randGen.reset();
+    	startMapGeneration();
     }
     
 	public static void main(String[] args) {
