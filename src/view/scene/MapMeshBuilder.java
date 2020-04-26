@@ -229,9 +229,9 @@ public class MapMeshBuilder {
 	
 	// Returns the 3D y coordinate for a given 2D elevation.
 	private float interpolateY(double elev2D) {
-		double elevMin2D = -1;
-		double elevRange2D = 2; 
-		return meshMinY + meshSizeY * (float) ((elev2D - elevMin2D) / elevRange2D); 
+		double elevMin2D = map.minElevation();
+		double elevRange2D = map.maxElevation() - elevMin2D;
+		return meshMinY + meshSizeY * (float) ((elev2D - map.minElevation()) / elevRange2D); 
 	}
 	
 	// Returns the 3D z coordinate for a given 2D y coordinate.

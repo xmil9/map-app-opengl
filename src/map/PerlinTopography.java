@@ -3,7 +3,6 @@ package map;
 import java.util.Random;
 
 import geometry.Rect2D;
-import math.MathUtil;
 import math.PerlinNoise;
 
 public class PerlinTopography implements TopographyGenerator {
@@ -36,6 +35,8 @@ public class PerlinTopography implements TopographyGenerator {
 	private final int width;
 	private final int height;
 	private final Random rand;
+	private double minElev = Double.MAX_VALUE;
+	private double maxElev = -Double.MAX_VALUE;
 	
 	public PerlinTopography(Spec spec, Random rand) {
 		this.spec = spec;
@@ -54,30 +55,24 @@ public class PerlinTopography implements TopographyGenerator {
 			MapNode node = rep.node(i);
 			double noise = perlinGen.calcOctaveNoise(node.pos, spec.numOctaves,
 					spec.persistence);
-			node.setElevation(scaleElevation(noise));
+			node.setElevation(updateElevationLimits(noise));
 		}
 		
 		for (int i = 0; i < rep.countTiles(); ++i) {
 			MapTile tile = rep.tile(i);
 			double noise = perlinGen.calcOctaveNoise(tile.seed, spec.numOctaves,
 					spec.persistence);
-			tile.setElevation(scaleElevation(noise));
+			tile.setElevation(updateElevationLimits(noise));
 		}
+		
+		rep.setElevationLimits(minElev, maxElev);
 	}
 	
-	// Scales elevation values because Perlin noise values calculated with multiple
-	// octaves tend to be pretty flat.
-	private static double scaleElevation(double elev) {
-		return MathUtil.clampToRange(stretch(elev), -1.0, 1.0);
-	}
-
-	// Stretches a given value depending on it's range.
-	private static double stretch(double t) {
-		double abs = Math.abs(t);
-		if (abs < .3)
-			return 4 * t;
-		else if (abs < .5)
-			return 3 * t;
-		return t;
+	private double updateElevationLimits(double elev) {
+		if (elev < minElev)
+			minElev = elev;
+		if (elev > maxElev)
+			maxElev = elev;
+		return elev;
 	}
 }

@@ -37,6 +37,9 @@ public class Map {
 		private java.util.Map<Point2D, MapNode> nodeLookup;
 		// Triangulation that map was generated with.
 		private List<Triangle2D> triangulation;
+		// Max and min elevations of the map.
+		private double minElev = Double.MAX_VALUE;
+		private double maxElev = -Double.MAX_VALUE;
 		
 		public Representation() {
 			tiles = new ArrayList<MapTile>();
@@ -99,6 +102,19 @@ public class Map {
 				return triangulation.get(idx);
 			return null;
 		}
+		
+		public double minElevation() {
+			return minElev;
+		}
+		
+		public double maxElevation() {
+			return maxElev;
+		}
+		
+		public void setElevationLimits(double min, double max) {
+			minElev = min;
+			maxElev = max;
+		}
 	}
 	
 	///////////////
@@ -145,6 +161,18 @@ public class Map {
 	
 	public Triangle2D triangle(int idx) {
 		return rep.triangle(idx);
+	}
+	
+	public double minElevation() {
+		return rep.minElevation();
+	}
+	
+	public double maxElevation() {
+		return rep.maxElevation();
+	}
+
+	public void setElevationLimits(double min, double max) {
+		rep.setElevationLimits(min, max);
 	}
 	
 	// Returns the shapes of all tiles.
