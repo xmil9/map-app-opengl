@@ -31,6 +31,7 @@ import view.PlaceholderMapItem;
 import view.PointLight;
 import view.Renderer;
 import view.Scene;
+import view.SceneLighting;
 import view.SeedElevationColorTheme;
 import view.Skybox;
 import view.SpotLight;
@@ -165,7 +166,6 @@ public class App implements UI.UIEventHandler {
 		setupContext();
 		setupScene();
 		setupMapScene();
-		setupLights();
 		setupUI();
 		setupSkybox();
 		input.setup(wnd);
@@ -344,27 +344,28 @@ public class App implements UI.UIEventHandler {
 		GL.createCapabilities();
 	}
 
-	private void setupLights() {
-		setupAmbientLight();
-        setupPointLight();
-        setupSpotLight();
-        setupDirectionalLight();
+	private static SceneLighting makeLighting() {
+		return new SceneLighting(
+				makeAmbientLight(),
+				makePointLight(),
+				makeSpotLight(),
+				makeDirectionalLight());
 	}
 	
-	private void setupAmbientLight() {
-        scene.setAmbientLight(new Vector3f(0.8f, 0.8f, 0.8f));
+	private static Vector3f makeAmbientLight() {
+        return new Vector3f(0.8f, 0.8f, 0.8f);
 	}
 	
-	private void setupPointLight() {
+	private static PointLight makePointLight() {
         Vector3f color = new Vector3f(1, 0, 1);
         Vector3f position = new Vector3f(0, 0, 1);
         float intensity = 20.0f;
         PointLight light = new PointLight(color, position, intensity);
         light.setAttenuation(new PointLight.Attenuation(0.0f, 0.0f, 1.0f));
-        scene.setPointLight(light);
+        return light;
 	}
 	
-	private void setupSpotLight() {
+	private static SpotLight makeSpotLight() {
         Vector3f color = new Vector3f(1, 1, 1);
 		Vector3f position = new Vector3f(0, 0.0f, 10f);
         float intensity = 0.0f;
@@ -373,18 +374,19 @@ public class App implements UI.UIEventHandler {
         
         Vector3f coneDir = new Vector3f(0, 0, -1);
         float cutoff = (float) Math.cos(Math.toRadians(140));
-        scene.setSpotLight(new SpotLight(pointLight, coneDir, cutoff));
+        return new SpotLight(pointLight, coneDir, cutoff);
 	}
 	
-	private void setupDirectionalLight() {
+	private static DirectionalLight makeDirectionalLight() {
         Vector3f color = new Vector3f(1, 1, 1);
 		Vector3f position = new Vector3f(-1, 0, 0);
         float intensity = 0.7f;
-        scene.setDirectionalLight(new DirectionalLight(color, position, intensity));
+        return new DirectionalLight(color, position, intensity);
 	}
 	
 	private void setupScene() throws Exception {
 		scene = new Scene();
+		scene.setLighting(makeLighting());
 	}
 	
 	private void setupMapScene() throws Exception {

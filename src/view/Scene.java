@@ -17,7 +17,7 @@ import app.Util;
 public class Scene {
 
 	private List<RenderedItem> items = new ArrayList<RenderedItem>();
-	private SceneLighting lighting = new SceneLighting();
+	private SceneLighting lighting;
 	private Shader shader;
 
 	public Scene() throws Exception {
@@ -50,21 +50,9 @@ public class Scene {
 		return lighting.ambientLight();
 	}
 	
-    public void setAmbientLight(Vector3f light) {
-    	lighting.setAmbientLight(light);
-    }
-    
-    public void setPointLight(PointLight light) {
-    	lighting.setPointLight(light);
-    }
-    
-    public void setSpotLight(SpotLight light) {
-    	lighting.setSpotLight(light);
-    }
-    
-    public void setDirectionalLight(DirectionalLight light) {
-    	lighting.setDirectionalLight(light);
-    }
+	public void setLighting(SceneLighting lighting) {
+		this.lighting = lighting;
+	}
     
     public void render(Matrix4f projMat, Matrix4f viewMat) {
         shader.bind();
