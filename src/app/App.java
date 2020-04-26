@@ -19,6 +19,7 @@ import view.GrayscaleColorTheme;
 import view.InputProcessor;
 import view.MapColorPolicy;
 import view.MapColorTheme;
+import view.MapGenerationTask;
 import view.MapItem;
 import view.MapMeshBuilder;
 import view.MapScene;
@@ -140,9 +141,7 @@ public class App implements UI.UIEventHandler {
 	// App-wide random number generator. Must be used everywhere to guarantee
 	// deterministic map generation.
 	private Random rand;
-	private boolean hasMapGenerationStarted = false;
-	private MapGenerator mapGen;
-	private Thread mapGenThread;
+	private MapGenerationTask mapGen = new MapGenerationTask();
 	private MapItem placeholderItem;
 
 	public void run() {
@@ -202,10 +201,7 @@ public class App implements UI.UIEventHandler {
 	private void startMapGeneration() {
 		if (ui != null)
 			ui.enable(false);
-		mapGen = new MapGenerator(makeModelSpec(spec), rand);
-		mapGenThread = new Thread(mapGen);
-		mapGenThread.start();
-		hasMapGenerationStarted = true;
+		mapGen.start(makeModelSpec(spec), rand);
 	}
 	
 	private void finishMapGeneration() {
@@ -213,20 +209,12 @@ public class App implements UI.UIEventHandler {
 			ui.setStatusText("");
 			ui.enable(true);
 		}
-		mapGen = null;
-		mapGenThread = null;
-	}
-	
-	private boolean hasMapGenerationFinished() {
-		if (!hasMapGenerationStarted)
-			return false;
-		return !mapGenThread.isAlive();
+		mapGen.clean();
 	}
 	
 	private void checkMapGeneration() {
-		if (hasMapGenerationStarted) {
-			if (hasMapGenerationFinished()) {
-				hasMapGenerationStarted = false;
+		if (mapGen.hasStarted()) {
+			if (mapGen.hasFinished()) {
 				mapScene.removeItem(placeholderItem);
 				createMapItem();
 				finishMapGeneration();
@@ -398,8 +386,8 @@ public class App implements UI.UIEventHandler {
 	
 	private void setupUI() throws Exception {
 		ui = new UI(makeSeedInfo(spec.randSeed), this);
-		ui.enable(!hasMapGenerationStarted);
-		ui.setStatusText(hasMapGenerationStarted ? "Generating map..." : "");
+		ui.enable(!mapGen.hasStarted());
+		ui.setStatusText(mapGen.hasStarted() ? "Generating map..." : "");
 	}
 	
 	private static String makeSeedInfo(long seed) {
