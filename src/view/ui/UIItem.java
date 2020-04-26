@@ -2,8 +2,8 @@ package view.ui;
 
 import org.joml.Vector2d;
 
-import view.MouseState;
-import view.RenderedItem;
+import view.input.MouseState;
+import view.render.RenderedItem;
 
 
 public abstract class UIItem extends RenderedItem {

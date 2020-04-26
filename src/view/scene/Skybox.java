@@ -4,10 +4,13 @@
 // The original code has been modified to suit this project.
 //
 
-package view;
+package view.scene;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+
+import io.IOUtil;
+import view.render.Shader;
 
 public class Skybox {
 
@@ -22,8 +25,8 @@ public class Skybox {
 
     private static Shader makeSkyBoxShader() throws Exception {
 	    Shader shader = new Shader();
-        shader.createVertexShader(Utils.loadResource("/view/SkyboxVertexShader.vs"));
-        shader.createFragmentShader(Utils.loadResource("/view/SkyboxFragmentShader.fs"));
+        shader.createVertexShader(IOUtil.loadResource("/view/scene/SkyboxVertexShader.vs"));
+        shader.createFragmentShader(IOUtil.loadResource("/view/scene/SkyboxFragmentShader.fs"));
         shader.link();
         shader.createUniform("projectionMatrix");
         shader.createUniform("modelViewMatrix");

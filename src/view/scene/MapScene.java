@@ -1,11 +1,13 @@
-package view;
+package view.scene;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.joml.Matrix4f;
 
-import app.Util;
+import io.IOUtil;
+import view.render.RenderedItem;
+import view.render.Shader;
 
 public class MapScene {
 
@@ -18,8 +20,8 @@ public class MapScene {
 	
 	private static Shader makeSceneShader() throws Exception {
 	    Shader shader = new Shader();
-	    shader.createVertexShader(Util.loadResource("/view/MapSceneVertexShader.vs"));
-	    shader.createFragmentShader(Util.loadResource("/view/MapSceneFragmentShader.fs"));
+	    shader.createVertexShader(IOUtil.loadResource("/view/scene/MapSceneVertexShader.vs"));
+	    shader.createFragmentShader(IOUtil.loadResource("/view/scene/MapSceneFragmentShader.fs"));
 	    shader.link();
         shader.createUniform("projectionMatrix");
         shader.createUniform("modelViewMatrix");

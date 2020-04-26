@@ -1,4 +1,4 @@
-package view;
+package view.scene;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,7 @@ import geometry.Point2D;
 import map.MapNode;
 import map.MapTile;
 import types.Triple;
+import types.ConversionUtil;
 import view.color.MapColorTheme;
 
 // Builds a 3D mesh for a 2D map.
@@ -107,11 +108,11 @@ public class MapMeshBuilder {
 		}
 		
 		return new Mesh(
-				Utils.toFloatArray(vertices),
-				Utils.toFloatArray(normals),
-				Utils.toIntArray(indices),
+				ConversionUtil.toFloatArray(vertices),
+				ConversionUtil.toFloatArray(normals),
+				ConversionUtil.toIntArray(indices),
 				null,
-				Utils.toFloatArray(colors));
+				ConversionUtil.toFloatArray(colors));
 	}
 	
 	// Adds the 3D coordinates of a given 2D map point to the vertex list. 

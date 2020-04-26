@@ -4,7 +4,7 @@
 // The original code has been modified to suit this project.
 //
 
-package view;
+package view.render;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;

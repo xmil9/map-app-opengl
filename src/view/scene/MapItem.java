@@ -4,24 +4,29 @@
 // The original code has been modified to suit this project.
 //
 
-package view;
+package view.scene;
 
 import org.joml.Vector3f;
 
-public class SkyboxItem extends RenderedItem {
+import view.render.RenderedItem;
+
+public class MapItem extends RenderedItem {
 
 	private final Mesh shape;
-	private final Material material;
+	private Material material;
+	private Vector3f pos;
 	private float scale;
 	// Rotation angles in radians.
 	private Vector3f rot;
+
 	
-    public SkyboxItem(String objModel, String textureFile) throws Exception {
-        this.shape = ObjectLoader.loadMesh(objModel);
-        this.material = new Material(new Texture(textureFile));
+	public MapItem(Mesh shape, Material material) {
+		this.shape = shape;
+		this.material = material;
+		this.pos = new Vector3f(0, 0, 0);
 		this.scale = 1;
 		this.rot = new Vector3f(0, 0, 0);
-    }
+	}
 
     @Override
     public Mesh shape() {
@@ -35,12 +40,14 @@ public class SkyboxItem extends RenderedItem {
 
     @Override
 	public Vector3f position() {
-    	// Always at origin (around the camera).
-		return new Vector3f(0, 0, 0);
+		return new Vector3f(pos.x, pos.y, pos.z);
 	}
 	
     @Override
 	public void setPosition(float x, float y, float z) {
+		pos.x = x;
+		pos.y = y;
+		pos.z = z;
 	}
 	
     @Override
@@ -48,13 +55,25 @@ public class SkyboxItem extends RenderedItem {
 		return scale;
 	}
 	
-    public void setScale(float scale) {
-    	this.scale = scale;
-    }
-    
+	public void setScale(float scale) {
+		this.scale = scale;
+	}
+	
     @Override
 	public Vector3f rotation() {
 		return new Vector3f(rot.x, rot.y, rot.z);
+	}
+	
+	public void setRotation(float x, float y, float z) {
+		rot.x = x;
+		rot.y = y;
+		rot.z = z;
+	}
+	
+	public void setRotationDegrees(float degX, float degY, float degZ) {
+		rot.x = (float) Math.toRadians(degX);
+		rot.y = (float) Math.toRadians(degY);
+		rot.z = (float) Math.toRadians(degZ);
 	}
 	
     @Override

@@ -4,7 +4,7 @@
 // The original code has been modified to suit this project.
 //
 
-package view;
+package view.render;
 
 import static org.lwjgl.opengl.GL20.*;
 
@@ -19,6 +19,7 @@ import org.lwjgl.system.MemoryStack;
 import view.light.DirectionalLight;
 import view.light.PointLight;
 import view.light.SpotLight;
+import view.scene.Material;
 
 public class Shader {
 

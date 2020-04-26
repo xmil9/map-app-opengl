@@ -11,11 +11,11 @@ import java.util.List;
 
 import org.joml.Vector3f;
 
-import view.FontTexture;
-import view.Material;
-import view.Mesh;
-import view.Texture;
-import view.Utils;
+import types.ConversionUtil;
+import view.scene.FontTexture;
+import view.scene.Material;
+import view.scene.Mesh;
+import view.scene.Texture;
 
 public class TextItem extends UIItem {
 
@@ -155,10 +155,10 @@ public class TextItem extends UIItem {
         }
         
         return new Mesh(
-        		Utils.toFloatArray(positions),
+        		ConversionUtil.toFloatArray(positions),
         		normals,
-        		Utils.toIntArray(indices),
-        		Utils.toFloatArray(textCoords),
+        		ConversionUtil.toIntArray(indices),
+        		ConversionUtil.toFloatArray(textCoords),
         		null);
     }
 }

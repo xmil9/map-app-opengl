@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.joml.Vector3f;
 
-import view.Material;
-import view.Mesh;
-import view.MouseState;
-import view.Texture;
-import view.Utils;
+import types.ConversionUtil;
+import view.input.MouseState;
+import view.scene.Material;
+import view.scene.Mesh;
+import view.scene.Texture;
 
 public class ImageButtonItem extends UIItem {
 
@@ -208,10 +208,10 @@ public class ImageButtonItem extends UIItem {
         indices.add(2);
         
         return new Mesh(
-        		Utils.toFloatArray(positions),
+        		ConversionUtil.toFloatArray(positions),
         		normals,
-        		Utils.toIntArray(indices),
-        		Utils.toFloatArray(texCoords),
+        		ConversionUtil.toIntArray(indices),
+        		ConversionUtil.toFloatArray(texCoords),
         		null);
     }
 }

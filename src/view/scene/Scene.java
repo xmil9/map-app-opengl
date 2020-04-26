@@ -4,7 +4,7 @@
 // The original code has been modified to suit this project.
 //
 
-package view;
+package view.scene;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +12,10 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import app.Util;
+import io.IOUtil;
 import view.light.SceneLighting;
+import view.render.RenderedItem;
+import view.render.Shader;
 
 public class Scene {
 
@@ -27,8 +29,8 @@ public class Scene {
 	
 	private static Shader makeSceneShader() throws Exception {
 	    Shader shader = new Shader();
-	    shader.createVertexShader(Util.loadResource("/view/SceneVertexShader.vs"));
-	    shader.createFragmentShader(Util.loadResource("/view/SceneFragmentShader.fs"));
+	    shader.createVertexShader(IOUtil.loadResource("/view/scene/SceneVertexShader.vs"));
+	    shader.createFragmentShader(IOUtil.loadResource("/view/scene/SceneFragmentShader.fs"));
 	    shader.link();
         shader.createUniform("projectionMatrix");
         shader.createUniform("modelViewMatrix");

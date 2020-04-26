@@ -4,12 +4,18 @@
 // The original code has been modified to suit this project.
 //
 
-package view;
+package view.scene;
 
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL30.*;
 
 import org.joml.Vector3f;
+
+import view.render.ColorVbo;
+import view.render.NormalVbo;
+import view.render.TextureCoordVbo;
+import view.render.VertexIndexVbo;
+import view.render.VertexVbo;
 
 public class Mesh {
 

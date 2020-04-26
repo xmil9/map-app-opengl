@@ -4,7 +4,7 @@
 // The original code has been modified to suit this project.
 //
 
-package view;
+package view.scene;
 
 import org.joml.Vector3f;
 

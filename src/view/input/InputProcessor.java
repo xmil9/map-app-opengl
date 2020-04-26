@@ -4,7 +4,7 @@
 // The original code has been modified to suit this project.
 //
 
-package view;
+package view.input;
 
 import org.joml.Vector2d;
 import org.joml.Vector2f;

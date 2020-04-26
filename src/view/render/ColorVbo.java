@@ -4,38 +4,32 @@
 // The original code has been modified to suit this project.
 //
 
-package view;
+package view.render;
 
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glDeleteBuffers;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-
-import java.nio.FloatBuffer;
+import java.nio.*;
 
 import org.lwjgl.system.MemoryUtil;
 
-public class NormalVbo {
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
+
+public class ColorVbo {
 
 	public final int id;
 	private int numElems = 0;
 	
-	public NormalVbo() {
+	public ColorVbo() {
 		id = glGenBuffers();
 	}
 	
-	public void setNormals(float[] normals, int attribIdx) {
-		numElems = normals.length;
+	public void setColors(float[] colors, int attribIdx) {
+		numElems = colors.length;
 		
         FloatBuffer buffer = null;
         try {
-            buffer = MemoryUtil.memAllocFloat(normals.length);
-            buffer.put(normals).flip();
+            buffer = MemoryUtil.memAllocFloat(colors.length);
+            buffer.put(colors).flip();
 	        
             glBindBuffer(GL_ARRAY_BUFFER, id);
 	        glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);            

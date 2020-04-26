@@ -4,7 +4,7 @@
 // The original code has been modified to suit this project.
 //
 
-package view;
+package view.render;
 
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
@@ -17,6 +17,10 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+
+import view.scene.Material;
+import view.scene.Mesh;
+import view.scene.Texture;
 
 public abstract class RenderedItem {
 	

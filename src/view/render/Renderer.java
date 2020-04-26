@@ -4,7 +4,7 @@
 // The original code has been modified to suit this project.
 //
 
-package view;
+package view.render;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -12,6 +12,10 @@ import org.joml.Vector3f;
 import static org.lwjgl.opengl.GL11.*;
 
 import types.Pair;
+import view.scene.Camera;
+import view.scene.MapScene;
+import view.scene.Scene;
+import view.scene.Skybox;
 import view.ui.UI;
 import view.ui.Window;
 

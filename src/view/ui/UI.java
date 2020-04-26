@@ -14,12 +14,12 @@ import org.joml.Matrix4f;
 import org.joml.Vector2d;
 import org.joml.Vector4f;
 
-import app.Util;
-import view.FontTexture;
-import view.MouseState;
-import view.RenderedItem;
-import view.Shader;
-import view.Texture;
+import io.IOUtil;
+import view.input.MouseState;
+import view.render.RenderedItem;
+import view.render.Shader;
+import view.scene.FontTexture;
+import view.scene.Texture;
 
 public class UI {
 	
@@ -67,8 +67,8 @@ public class UI {
 	
 	private static Shader makeUIShader() throws Exception {
 	    Shader shader = new Shader();
-	    shader.createVertexShader(Util.loadResource("/view/ui/UIVertexShader.vs"));
-	    shader.createFragmentShader(Util.loadResource("/view/ui/UIFragmentShader.fs"));
+	    shader.createVertexShader(IOUtil.loadResource("/view/ui/UIVertexShader.vs"));
+	    shader.createFragmentShader(IOUtil.loadResource("/view/ui/UIFragmentShader.fs"));
 	    shader.link();
         shader.createUniform("projModelMatrix");
         shader.createUniform("color");
