@@ -43,7 +43,7 @@ public class Renderer {
 	public void cleanup() {
 	}
 
-    public void render(Scene scene, MapScene mapScene, Skybox skybox, Hud hud,
+    public void render(Scene scene, MapScene mapScene, Skybox skybox, UI ui,
     		Window wnd, Camera cam) {
         clear();
         
@@ -53,7 +53,7 @@ public class Renderer {
         scene.render(projMat3D, viewMat);
         mapScene.render(projMat3D, viewMat);
         //skybox.render(projMat3D, viewMat);
-        hud.render(projMat2D);
+        ui.render(projMat2D);
     }
     
     public void clear() {

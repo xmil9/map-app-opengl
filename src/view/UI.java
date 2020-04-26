@@ -16,7 +16,7 @@ import org.joml.Vector4f;
 
 import app.Util;
 
-public class Hud {
+public class UI {
 	
 	///////////////
 	
@@ -37,7 +37,7 @@ public class Hud {
     private MouseState lastMouseState = new MouseState();
     private UIItem lastTouchedItem;
 
-    public Hud(String seedText, UIEventHandler callbacks) throws Exception {
+    public UI(String seedText, UIEventHandler callbacks) throws Exception {
     	this.callbacks = callbacks;
         
     	this.seedLabel = new TextItem(seedText, new FontTexture(FONT, CHARSET));
@@ -57,13 +57,13 @@ public class Hud {
         this.statusLabel.material().setAmbientColor(new Vector4f(0.8f, 0.8f, 0.8f, 1));
         this.items.add(this.statusLabel);
 
-        this.shader = makeHudShader();
+        this.shader = makeUIShader();
     }
 	
-	private static Shader makeHudShader() throws Exception {
+	private static Shader makeUIShader() throws Exception {
 	    Shader shader = new Shader();
-	    shader.createVertexShader(Util.loadResource("/view/HudVertex.vs"));
-	    shader.createFragmentShader(Util.loadResource("/view/HudFragment.fs"));
+	    shader.createVertexShader(Util.loadResource("/view/UIVertexShader.vs"));
+	    shader.createFragmentShader(Util.loadResource("/view/UIFragmentShader.fs"));
 	    shader.link();
         shader.createUniform("projModelMatrix");
         shader.createUniform("color");

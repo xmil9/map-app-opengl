@@ -17,7 +17,7 @@ import view.AppWindow;
 import view.Camera;
 import view.DirectionalLight;
 import view.GrayscaleColorTheme;
-import view.Hud;
+import view.UI;
 import view.InputProcessor;
 import view.MapColorPolicy;
 import view.MapColorTheme;
@@ -45,7 +45,7 @@ import java.nio.IntBuffer;
 import java.util.Random;
 
 // Main application.
-public class App implements Hud.UIEventHandler {
+public class App implements UI.UIEventHandler {
 
 	///////////////
 	
@@ -135,7 +135,7 @@ public class App implements Hud.UIEventHandler {
 	private Scene scene;
 	private MapScene mapScene;
 	private Skybox skybox;
-	private Hud hud;
+	private UI ui;
 	private Spec spec;
 	// App-wide random number generator. Must be used everywhere to guarantee
 	// deterministic map generation.
@@ -166,7 +166,7 @@ public class App implements Hud.UIEventHandler {
 		setupScene();
 		setupMapScene();
 		setupLights();
-		setupHud();
+		setupUI();
 		setupSkybox();
 		input.setup(wnd);
 		renderer.setup(wnd);
@@ -176,7 +176,7 @@ public class App implements Hud.UIEventHandler {
 
 	private void cleanup() {
 		renderer.cleanup();
-		hud.cleanup();
+		ui.cleanup();
 		scene.cleanup();
 		skybox.cleanup();
 		cleanupWindow();
@@ -200,8 +200,8 @@ public class App implements Hud.UIEventHandler {
 	}
 	
 	private void startMapGeneration() {
-		if (hud != null)
-			hud.enable(false);
+		if (ui != null)
+			ui.enable(false);
 		mapGen = new MapGenerator(makeModelSpec(spec), rand);
 		mapGenThread = new Thread(mapGen);
 		mapGenThread.start();
@@ -209,9 +209,9 @@ public class App implements Hud.UIEventHandler {
 	}
 	
 	private void finishMapGeneration() {
-		if (hud != null) {
-			hud.setStatusText("");
-			hud.enable(true);
+		if (ui != null) {
+			ui.setStatusText("");
+			ui.enable(true);
 		}
 		mapGen = null;
 		mapGenThread = null;
@@ -396,10 +396,10 @@ public class App implements Hud.UIEventHandler {
 		mapScene = new MapScene();
 	}
 	
-	private void setupHud() throws Exception {
-		hud = new Hud(makeSeedInfo(spec.randSeed), this);
-		hud.enable(!hasMapGenerationStarted);
-		hud.setStatusText(hasMapGenerationStarted ? "Computing map..." : "");
+	private void setupUI() throws Exception {
+		ui = new UI(makeSeedInfo(spec.randSeed), this);
+		ui.enable(!hasMapGenerationStarted);
+		ui.setStatusText(hasMapGenerationStarted ? "Generating map..." : "");
 	}
 	
 	private static String makeSeedInfo(long seed) {
@@ -421,14 +421,14 @@ public class App implements Hud.UIEventHandler {
 			processUI();
 			updateCamera(input);
 			checkMapGeneration();
-			renderer.render(scene, mapScene, skybox, hud, wnd, camera);
+			renderer.render(scene, mapScene, skybox, ui, wnd, camera);
 			wnd.update();
 		}
 	}
     
 	private void resize() {
 		resizeViewport();
-        hud.resize(wnd);
+        ui.resize(wnd);
 	}
     
 	private void resizeViewport() {
@@ -448,7 +448,7 @@ public class App implements Hud.UIEventHandler {
     }
 	
     private void processUI() {
-    	hud.processMouse(input.mouseState());
+    	ui.processMouse(input.mouseState());
     }
     
     private void updateCamera(InputProcessor input) {
@@ -482,8 +482,8 @@ public class App implements Hud.UIEventHandler {
 			mapScene.clear();
 			mapScene.addItem(placeholderItem);
 			startMapGeneration();
-			hud.setSeedInfo(makeSeedInfo(seed));
-			hud.setStatusText("Computing map...");
+			ui.setSeedInfo(makeSeedInfo(seed));
+			ui.setStatusText("Generating map...");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
