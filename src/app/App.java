@@ -200,13 +200,17 @@ public class App implements Hud.UIEventHandler {
 	}
 	
 	private void startMapGeneration() {
+		if (hud != null)
+			hud.enable(false);
 		mapGen = new MapGenerator(makeModelSpec(spec), rand);
 		mapGenThread = new Thread(mapGen);
 		mapGenThread.start();
 		hasMapGenerationStarted = true;
 	}
 	
-	private void cleanupMapGeneration() {
+	private void finishMapGeneration() {
+		if (hud != null)
+			hud.enable(true);
 		mapGen = null;
 		mapGenThread = null;
 	}
@@ -223,7 +227,7 @@ public class App implements Hud.UIEventHandler {
 				hasMapGenerationStarted = false;
 				mapScene.removeItem(placeholderItem);
 				createMapItem();
-				cleanupMapGeneration();
+				finishMapGeneration();
 			} else {
 				animatePlaceholderMap();
 			}
@@ -391,7 +395,8 @@ public class App implements Hud.UIEventHandler {
 	}
 	
 	private void setupHud() throws Exception {
-		hud = new Hud(makeSeedInfo(spec.randSeed), this);		
+		hud = new Hud(makeSeedInfo(spec.randSeed), this);
+		hud.enable(!hasMapGenerationStarted);
 	}
 	
 	private static String makeSeedInfo(long seed) {
@@ -469,17 +474,15 @@ public class App implements Hud.UIEventHandler {
 	
     public void onReset()
     {
-    	if (!hasMapGenerationStarted) {
-	    	try {
-				long seed = resetRandomization(null);
-				mapScene.clear();
-				mapScene.addItem(placeholderItem);
-				startMapGeneration();
-				hud.setStatusText(makeSeedInfo(seed));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-    	}
+    	try {
+			long seed = resetRandomization(null);
+			mapScene.clear();
+			mapScene.addItem(placeholderItem);
+			startMapGeneration();
+			hud.setStatusText(makeSeedInfo(seed));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     }
     
 	public static void main(String[] args) {

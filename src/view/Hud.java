@@ -89,6 +89,11 @@ public class Hud {
         shader.unbind();
     }
 
+    public void enable(boolean enable) {
+    	for (UIItem item : items)
+    		item.enable(enable);
+    }
+    
     public void cleanup() {
 		if (shader != null)
 			shader.cleanup();

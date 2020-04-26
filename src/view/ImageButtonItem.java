@@ -112,33 +112,46 @@ public class ImageButtonItem extends UIItem {
     }
     
     @Override
+    public void enable(boolean enable) {
+    	super.enable(enable);
+    	material.setTexture(enable ? imageTexs.normal : imageTexs.disabled);
+    }
+    
+    @Override
     public void onMouseEntered(MouseState curState) {
-    	material.setTexture(imageTexs.focused);
+    	if (isEnabled())
+    		material.setTexture(imageTexs.focused);
     }
     
     @Override
     public void onMouseExited(MouseState curState) {
-    	material.setTexture(imageTexs.normal);
+    	if (isEnabled())
+    		material.setTexture(imageTexs.normal);
     }
     
     @Override
     public void onMouseMoved(MouseState curState) {
-    	material.setTexture(curState.leftButtonDown ?
-    			imageTexs.pressed : imageTexs.focused);
+    	if (isEnabled())
+	    	material.setTexture(curState.leftButtonDown ?
+	    			imageTexs.pressed : imageTexs.focused);
     }
     
     @Override
     public void onMouseButtonDown(MouseState.Button button, MouseState curState) {
-    	if (button == MouseState.Button.Left) {
-	    	material.setTexture(imageTexs.pressed);
+    	if (isEnabled()) {
+	    	if (button == MouseState.Button.Left) {
+		    	material.setTexture(imageTexs.pressed);
+	    	}
     	}
     }
     
     @Override
     public void onMouseButtonUp(MouseState.Button button, MouseState curState) {
-    	if (button == MouseState.Button.Left) {
-	    	material.setTexture(imageTexs.focused);
-	    	callbacks.onPressed();
+    	if (isEnabled()) {
+	    	if (button == MouseState.Button.Left) {
+		    	material.setTexture(imageTexs.focused);
+		    	callbacks.onPressed();
+	    	}
     	}
     }
     

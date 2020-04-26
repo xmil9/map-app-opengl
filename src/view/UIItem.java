@@ -4,8 +4,18 @@ import org.joml.Vector2d;
 
 public abstract class UIItem extends RenderedItem {
 	
+	private boolean enabled = true;
+	
 	public abstract float width();
 	public abstract float height();
+	
+	public void enable(boolean enable) {
+		enabled = enable;
+	}
+	
+	public boolean isEnabled() {
+		return enabled;
+	}
 	
 	public boolean hitTest(Vector2d pos) {
 		boolean horzHit = position().x <= pos.x &&
