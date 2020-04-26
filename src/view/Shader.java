@@ -16,6 +16,10 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.system.MemoryStack;
 
+import view.light.DirectionalLight;
+import view.light.PointLight;
+import view.light.SpotLight;
+
 public class Shader {
 
     private final int programId;

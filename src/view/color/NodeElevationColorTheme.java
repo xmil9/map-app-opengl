@@ -1,4 +1,4 @@
-package view;
+package view.color;
 
 import java.util.List;
 

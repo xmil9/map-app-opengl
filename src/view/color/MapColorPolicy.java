@@ -1,4 +1,4 @@
-package view;
+package view.color;
 
 public enum MapColorPolicy {
 	SeedElevationColors,

@@ -9,6 +9,7 @@ import geometry.Point2D;
 import map.MapNode;
 import map.MapTile;
 import types.Triple;
+import view.color.MapColorTheme;
 
 // Builds a 3D mesh for a 2D map.
 public class MapMeshBuilder {

@@ -4,7 +4,7 @@
 // The original code has been modified to suit this project.
 //
 
-package view;
+package view.light;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

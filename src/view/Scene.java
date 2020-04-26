@@ -13,6 +13,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import app.Util;
+import view.light.SceneLighting;
 
 public class Scene {
 
