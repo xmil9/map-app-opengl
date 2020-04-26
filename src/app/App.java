@@ -469,15 +469,17 @@ public class App implements Hud.UIEventHandler {
 	
     public void onReset()
     {
-    	try {
-			long seed = resetRandomization(null);
-			mapScene.clear();
-			mapScene.addItem(placeholderItem);
-			startMapGeneration();
-			hud.setStatusText(makeSeedInfo(seed));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    	if (!hasMapGenerationStarted) {
+	    	try {
+				long seed = resetRandomization(null);
+				mapScene.clear();
+				mapScene.addItem(placeholderItem);
+				startMapGeneration();
+				hud.setStatusText(makeSeedInfo(seed));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+    	}
     }
     
 	public static void main(String[] args) {
