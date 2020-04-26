@@ -10,6 +10,8 @@ import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import view.ui.Window;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class InputProcessor {

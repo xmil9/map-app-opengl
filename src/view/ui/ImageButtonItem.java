@@ -1,9 +1,15 @@
-package view;
+package view.ui;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.joml.Vector3f;
+
+import view.Material;
+import view.Mesh;
+import view.MouseState;
+import view.Texture;
+import view.Utils;
 
 public class ImageButtonItem extends UIItem {
 

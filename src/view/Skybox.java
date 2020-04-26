@@ -22,8 +22,8 @@ public class Skybox {
 
     private static Shader makeSkyBoxShader() throws Exception {
 	    Shader shader = new Shader();
-        shader.createVertexShader(Utils.loadResource("/view/SkyboxVertex.vs"));
-        shader.createFragmentShader(Utils.loadResource("/view/SkyboxFragment.fs"));
+        shader.createVertexShader(Utils.loadResource("/view/SkyboxVertexShader.vs"));
+        shader.createFragmentShader(Utils.loadResource("/view/SkyboxFragmentShader.fs"));
         shader.link();
         shader.createUniform("projectionMatrix");
         shader.createUniform("modelViewMatrix");

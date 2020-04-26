@@ -15,13 +15,13 @@ public class MouseState {
 	public final boolean leftButtonDown;
 	public final boolean rightButtonDown;
 	
-	MouseState(Vector2d pos, boolean leftDown, boolean rightDown) {
+	public MouseState(Vector2d pos, boolean leftDown, boolean rightDown) {
 		this.pos = new Vector2d(pos);
 		this.leftButtonDown = leftDown;
 		this.rightButtonDown = rightDown;
 	}
 	
-	MouseState() {
+	public MouseState() {
 		this(new Vector2d(Double.MIN_VALUE, Double.MIN_VALUE), false, true);
 	}
 	

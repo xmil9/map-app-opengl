@@ -4,7 +4,7 @@
 // The original code has been modified to suit this project.
 //
 
-package view;
+package view.ui;
 
 import java.awt.Font;
 import java.util.ArrayList;
@@ -15,6 +15,11 @@ import org.joml.Vector2d;
 import org.joml.Vector4f;
 
 import app.Util;
+import view.FontTexture;
+import view.MouseState;
+import view.RenderedItem;
+import view.Shader;
+import view.Texture;
 
 public class UI {
 	
@@ -62,8 +67,8 @@ public class UI {
 	
 	private static Shader makeUIShader() throws Exception {
 	    Shader shader = new Shader();
-	    shader.createVertexShader(Util.loadResource("/view/UIVertexShader.vs"));
-	    shader.createFragmentShader(Util.loadResource("/view/UIFragmentShader.fs"));
+	    shader.createVertexShader(Util.loadResource("/view/ui/UIVertexShader.vs"));
+	    shader.createFragmentShader(Util.loadResource("/view/ui/UIFragmentShader.fs"));
 	    shader.link();
         shader.createUniform("projModelMatrix");
         shader.createUniform("color");

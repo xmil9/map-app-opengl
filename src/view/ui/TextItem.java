@@ -4,12 +4,18 @@
 // The original code has been modified to suit this project.
 //
 
-package view;
+package view.ui;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.joml.Vector3f;
+
+import view.FontTexture;
+import view.Material;
+import view.Mesh;
+import view.Texture;
+import view.Utils;
 
 public class TextItem extends UIItem {
 

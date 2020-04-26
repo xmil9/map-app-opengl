@@ -1,6 +1,10 @@
-package view;
+package view.ui;
 
 import org.joml.Vector2d;
+
+import view.MouseState;
+import view.RenderedItem;
+
 
 public abstract class UIItem extends RenderedItem {
 	

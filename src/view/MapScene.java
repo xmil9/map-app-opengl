@@ -18,8 +18,8 @@ public class MapScene {
 	
 	private static Shader makeSceneShader() throws Exception {
 	    Shader shader = new Shader();
-	    shader.createVertexShader(Util.loadResource("/view/MapSceneVertex.vs"));
-	    shader.createFragmentShader(Util.loadResource("/view/MapSceneFragment.fs"));
+	    shader.createVertexShader(Util.loadResource("/view/MapSceneVertexShader.vs"));
+	    shader.createFragmentShader(Util.loadResource("/view/MapSceneFragmentShader.fs"));
 	    shader.link();
         shader.createUniform("projectionMatrix");
         shader.createUniform("modelViewMatrix");

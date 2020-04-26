@@ -12,6 +12,8 @@ import org.joml.Vector3f;
 import static org.lwjgl.opengl.GL11.*;
 
 import types.Pair;
+import view.ui.UI;
+import view.ui.Window;
 
 public class Renderer {
 

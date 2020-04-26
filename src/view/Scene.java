@@ -26,8 +26,8 @@ public class Scene {
 	
 	private static Shader makeSceneShader() throws Exception {
 	    Shader shader = new Shader();
-	    shader.createVertexShader(Util.loadResource("/view/SceneVertex.vs"));
-	    shader.createFragmentShader(Util.loadResource("/view/SceneFragment.fs"));
+	    shader.createVertexShader(Util.loadResource("/view/SceneVertexShader.vs"));
+	    shader.createFragmentShader(Util.loadResource("/view/SceneFragmentShader.fs"));
 	    shader.link();
         shader.createUniform("projectionMatrix");
         shader.createUniform("modelViewMatrix");
