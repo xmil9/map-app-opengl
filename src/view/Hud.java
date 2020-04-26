@@ -31,6 +31,7 @@ public class Hud {
     private final List<UIItem> items = new ArrayList<UIItem>();
     private final TextItem seedLabel;
     private final ImageButtonItem resetButton;
+    private final TextItem statusLabel;
     private final UIEventHandler callbacks;
     private Shader shader;
     private MouseState lastMouseState = new MouseState();
@@ -38,7 +39,8 @@ public class Hud {
 
     public Hud(String seedText, UIEventHandler callbacks) throws Exception {
     	this.callbacks = callbacks;
-        this.seedLabel = new TextItem(seedText, new FontTexture(FONT, CHARSET));
+        
+    	this.seedLabel = new TextItem(seedText, new FontTexture(FONT, CHARSET));
         this.seedLabel.material().setAmbientColor(new Vector4f(0.8f, 0.8f, 0.8f, 1));
         this.items.add(this.seedLabel);
         
@@ -50,6 +52,10 @@ public class Hud {
         				new Texture("res/textures/reset_disabled.png")),
         		() -> this.callbacks.onReset());
         this.items.add(this.resetButton);
+        
+    	this.statusLabel = new TextItem("", new FontTexture(FONT, CHARSET));
+        this.statusLabel.material().setAmbientColor(new Vector4f(0.8f, 0.8f, 0.8f, 1));
+        this.items.add(this.statusLabel);
 
         this.shader = makeHudShader();
     }
@@ -64,8 +70,12 @@ public class Hud {
         return shader;
 	}
 
+    public void setSeedInfo(String seedInfo) {
+        seedLabel.setText(seedInfo);
+    }
+
     public void setStatusText(String statusText) {
-        this.seedLabel.setText(statusText);
+        statusLabel.setText(statusText);
     }
 
     public List<UIItem> items() {
@@ -75,6 +85,10 @@ public class Hud {
     public void resize(Window window) {
         seedLabel.setPosition(10f, 20f, 0);
         resetButton.setPosition(seedLabel.width() + 10f, 15f, 0);
+        statusLabel.setPosition(
+        		(window.width() - statusLabel.width()) / 2f,
+        		window.height() - 40f,
+        		0);
     }
     
     public void render(Matrix4f projMat) {

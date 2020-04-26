@@ -67,8 +67,8 @@ public class App implements Hud.UIEventHandler {
 		public float surfaceElevRatio3D = 0.6f;
 		
 		// Model specs.
-		public int mapWidth = 1000;
-		public int mapHeight = 1000;
+		public int mapWidth = 500;
+		public int mapHeight = 500;
 		// Smaller distance => smaller and more tiles.
 		public double minSampleDistance = 1;
 		// More candidates => more evenly spaced sample points but slower generation.
@@ -209,8 +209,10 @@ public class App implements Hud.UIEventHandler {
 	}
 	
 	private void finishMapGeneration() {
-		if (hud != null)
+		if (hud != null) {
+			hud.setStatusText("");
 			hud.enable(true);
+		}
 		mapGen = null;
 		mapGenThread = null;
 	}
@@ -397,6 +399,7 @@ public class App implements Hud.UIEventHandler {
 	private void setupHud() throws Exception {
 		hud = new Hud(makeSeedInfo(spec.randSeed), this);
 		hud.enable(!hasMapGenerationStarted);
+		hud.setStatusText(hasMapGenerationStarted ? "Computing map..." : "");
 	}
 	
 	private static String makeSeedInfo(long seed) {
@@ -479,7 +482,8 @@ public class App implements Hud.UIEventHandler {
 			mapScene.clear();
 			mapScene.addItem(placeholderItem);
 			startMapGeneration();
-			hud.setStatusText(makeSeedInfo(seed));
+			hud.setSeedInfo(makeSeedInfo(seed));
+			hud.setStatusText("Computing map...");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
