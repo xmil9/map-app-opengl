@@ -53,7 +53,7 @@ public class App implements UI.UIEventHandler {
 	///////////////
 	
 	public static class Spec {
-		public Long randSeed = 1234567890L;
+		public Long randSeed = 0L;//1234567890L;
 		
 		// View specs.
 		public int viewWidth = 1700;
@@ -63,15 +63,15 @@ public class App implements UI.UIEventHandler {
 		// Measure for steepness of map features.
 		// Larger => steeper map.
 		// Smaller => shallower map.
-		public float elevScale3D = 50f;
+		public float elevScale3D = 70f;
 		// Ratio of elevation at which the surface is located.
 		// Closer to 0.0 => Lower surface, less water
 		// Closer to 1.0 => Higher surface, more water
-		public float surfaceElevRatio3D = 0.6f;
+		public float surfaceElevRatio3D = 0.4f;
 		
 		// Model specs.
-		public int mapWidth = 500;
-		public int mapHeight = 500;
+		public int mapWidth = 2000;
+		public int mapHeight = 2000;
 		// Smaller distance => smaller and more tiles.
 		public double minSampleDistance = 1;
 		// More candidates => more evenly spaced sample points but slower generation.
@@ -79,7 +79,7 @@ public class App implements UI.UIEventHandler {
 		// More octaves => Wider and wider areas are affected by values of
 		// individual noise values of higher octave passes. Leads to zoomed in
 		// appearance on features of the map.
-		public int numOctaves = 9;
+		public int numOctaves = 12;
 		// Larger persistence => Larger and smoother features.
 		// Smaller persistence => Smaller and choppier features.
 		public double persistence = 2;
@@ -394,7 +394,7 @@ public class App implements UI.UIEventHandler {
 	}
 	
 	private void setupUI() throws Exception {
-		ui = new UI(makeSeedInfo(spec.randSeed), this);
+		ui = new UI(makeSeedInfo(randGen.seed()), this);
 		ui.enable(!mapGen.hasStarted());
 		ui.setStatusText(mapGen.hasStarted() ? "Generating map..." : "");
 	}
